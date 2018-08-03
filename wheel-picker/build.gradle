@@ -1,0 +1,33 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.minyushov.bintray'
+
+android {
+	compileSdkVersion 28
+	buildToolsVersion "28.0.1"
+
+	defaultConfig {
+		minSdkVersion 19
+		targetSdkVersion 28
+		versionCode 1
+		versionName "1.0.0"
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+}
+
+bintrayUpload {
+	artifactId = "wheel-picker"
+	repo = "android"
+	organization = "mercdev"
+	groupId = "com.mercdev.android"
+	version = "1.0.0"
+	vcsUrl = "https://github.com/minyushov/WheelPicker.git"
+	license = "Apache-2.0"
+	docs = false
+	dryRun = false
+}

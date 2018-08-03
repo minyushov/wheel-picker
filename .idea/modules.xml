@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Demo/Demo.iml" filepath="$PROJECT_DIR$/Demo/Demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/WheelPicker.iml" filepath="$PROJECT_DIR$/WheelPicker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/WheelPicker/WheelPicker-WheelPicker.iml" filepath="$PROJECT_DIR$/WheelPicker/WheelPicker-WheelPicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wheel-picker/wheel-picker.iml" filepath="$PROJECT_DIR$/wheel-picker/wheel-picker.iml" />
     </modules>
   </component>
 </project>
