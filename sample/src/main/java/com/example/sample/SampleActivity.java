@@ -44,9 +44,11 @@ public class SampleActivity extends AppCompatActivity {
 		WheelPicker wheelPicker1 = findViewById(R.id.wheel_picker_1);
 		WheelPicker wheelPicker2 = findViewById(R.id.wheel_picker_2);
 		WheelPicker wheelPicker3 = findViewById(R.id.wheel_picker_3);
+		WheelPicker wheelPicker4 = findViewById(R.id.wheel_picker_4);
 
 		wheelPicker1.setData(data);
 		wheelPicker2.setData(data);
 		wheelPicker3.setData(data);
+		wheelPicker4.setData(data);
 	}
 }
