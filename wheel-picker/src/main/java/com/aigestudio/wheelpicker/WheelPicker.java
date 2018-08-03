@@ -189,7 +189,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
   /**
    * 滚轮滑动时的最小/最大速度
    */
-  private int mMinimumVelocity = 50, mMaximumVelocity = 8000;
+  private int mMinimumVelocity = 50, mMaximumVelocity = 8000, mQuickScrollVelocity = 10000;
 
   /**
    * 滚轮选择器中心坐标
@@ -761,14 +761,42 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		// Judges the WheelPicker is scroll or fling base on current velocity
 		isForceFinishScroll = false;
 		int velocity = (int) mTracker.getYVelocity();
-		if (Math.abs(velocity) > mMinimumVelocity) {
-		  mScroller.fling(0, mScrollOffsetY, 0, velocity, 0, 0, mMinFlingY, mMaxFlingY);
-		  mScroller.setFinalY(mScroller.getFinalY() +
-				  computeDistanceToEndPoint(mScroller.getFinalY() % mItemHeight));
+
+		if (isCyclic) {
+		  if (Math.abs(velocity) > mMinimumVelocity) {
+			mScroller.fling(0, mScrollOffsetY, 0, velocity, 0, 0, mMinFlingY, mMaxFlingY);
+			mScroller.setFinalY(mScroller.getFinalY() +
+					computeDistanceToEndPoint(mScroller.getFinalY() % mItemHeight));
+
+		  } else {
+			mScroller.fling(0, mScrollOffsetY, 0, velocity, 0, 0, mMinFlingY, mMaxFlingY);
+			mScroller.setFinalY(mScroller.getFinalY() +
+					computeDistanceToEndPoint(mScroller.getFinalY() % mItemHeight));
+		  }
 		} else {
-		  mScroller.startScroll(0, mScrollOffsetY, 0,
-				  computeDistanceToEndPoint(mScrollOffsetY % mItemHeight));
+		  if (Math.abs(velocity) > mMinimumVelocity && !(mScrollOffsetY > mMaxFlingY) && !(mScrollOffsetY < mMinFlingY)) {
+			if (Math.abs(velocity) > mQuickScrollVelocity) {
+			  int dy = 0;
+
+			  if (velocity > 0) {
+				dy = -mScrollOffsetY;
+			  }
+			  if (velocity < 0) {
+				dy = -(Math.abs(mMinFlingY) - Math.abs(mScrollOffsetY));
+			  }
+
+			  mScroller.startScroll(0, mScrollOffsetY, 0, dy, 500);
+			} else {
+			  mScroller.fling(0, mScrollOffsetY, 0, velocity, 0, 0, mMinFlingY, mMaxFlingY);
+			  mScroller.setFinalY(mScroller.getFinalY() +
+					  computeDistanceToEndPoint(mScroller.getFinalY() % mItemHeight));
+			}
+		  } else {
+			mScroller.startScroll(0, mScrollOffsetY, 0,
+					computeDistanceToEndPoint(mScrollOffsetY % mItemHeight));
+		  }
 		}
+
 		// 校正坐标
 		// Correct coordinates
 		if (!isCyclic) {
