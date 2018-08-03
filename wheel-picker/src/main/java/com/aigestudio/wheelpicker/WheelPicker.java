@@ -296,7 +296,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	mData = new ArrayList();
 	mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size,
 			getResources().getDimensionPixelSize(R.dimen.default_text_size));
-	mVisibleItemCount = a.getInt(R.styleable.WheelPicker_wheel_visible_item_count, 7);
+//	mVisibleItemCount = a.getInt(R.styleable.WheelPicker_wheel_visible_item_count, 7);
+	mItemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_height,
+			getResources().getDimensionPixelSize(R.dimen.default_item_height));
 	mSelectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
 	hasSameWidth = a.getBoolean(R.styleable.WheelPicker_wheel_same_width, false);
 	mTextMaxWidthPosition =
@@ -319,10 +321,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	fontPath = a.getString(R.styleable.WheelPicker_wheel_font_path);
 	a.recycle();
 
-	// 可见数据项改变后更新与之相关的参数
-	// Update relevant parameters when the count of visible item changed
-	updateVisibleItemCount();
-
 	mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
 	mPaint.setTextSize(mItemTextSize);
 
@@ -338,6 +336,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	// 计算文本尺寸
 	// Correct sizes of text
 	computeTextSize();
+
+	mHalfItemHeight = mItemHeight / 2;
 
 	mScroller = new Scroller(getContext());
 
@@ -480,8 +480,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 	mHalfWheelHeight = mRectDrawn.height() / 2;
 
-	mItemHeight = mRectDrawn.height() / mVisibleItemCount;
-	mHalfItemHeight = mItemHeight / 2;
+	mVisibleItemCount = mRectDrawn.height() / mItemHeight;
+	updateVisibleItemCount();
 
 	// 初始化滑动最大坐标
 	// Initialize fling max Y-coordinates

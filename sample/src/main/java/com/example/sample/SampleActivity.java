@@ -40,33 +40,13 @@ public class SampleActivity extends AppCompatActivity {
 		data.add("23");
 		data.add("24");
 		data.add("25");
-//		data.add("26");
-//		data.add("27");
-//		data.add("28");
-//		data.add("29");
-//		data.add("30");
-//		data.add("31");
-//		data.add("32");
-//		data.add("33");
-//		data.add("34");
-//		data.add("35");
-//		data.add("36");
-//		data.add("37");
-//		data.add("38");
-//		data.add("39");
-//		data.add("40");
-//		data.add("41");
-//		data.add("42");
-//		data.add("43");
-//		data.add("44");
-//		data.add("45");
-//		data.add("46");
-//		data.add("47");
-//		data.add("48");
-//		data.add("49");
-//		data.add("50");
 
-		WheelPicker wheelPicker = findViewById(R.id.wheel_picker);
-		wheelPicker.setData(data);
+		WheelPicker wheelPicker1 = findViewById(R.id.wheel_picker_1);
+		WheelPicker wheelPicker2 = findViewById(R.id.wheel_picker_2);
+		WheelPicker wheelPicker3 = findViewById(R.id.wheel_picker_3);
+
+		wheelPicker1.setData(data);
+		wheelPicker2.setData(data);
+		wheelPicker3.setData(data);
 	}
 }
