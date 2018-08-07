@@ -1,6 +1,8 @@
 package com.example.sample;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -9,6 +11,8 @@ import com.aigestudio.wheelpicker.WheelPicker;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SampleActivity extends AppCompatActivity {
+	private static final String TAG = "SampleActivity";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,5 +54,38 @@ public class SampleActivity extends AppCompatActivity {
 		wheelPicker2.setData(data);
 		wheelPicker3.setData(data);
 		wheelPicker4.setData(data);
+
+		final TextView wheelPicker1Active = findViewById(R.id.wheel_picker_1_active);
+
+		wheelPicker1.setOnItemSelectedListener(new WheelPicker.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(WheelPicker picker, Object data, int position) {
+				Log.d(TAG, "onItemSelected: " + data.toString());
+			}
+		});
+
+		wheelPicker1.setOnWheelChangeListener(new WheelPicker.OnWheelChangeListener() {
+			@Override
+			public void onWheelScrolled(int offset) {
+//			Log.d(TAG, "onWheelScrolled: " + offset);
+			}
+
+			@Override
+			public void onWheelSelected(int position) {
+				Log.d(TAG, "onWheelSelected: " + position);
+			}
+
+			@Override
+			public void onWheelScrollStateChanged(int state) {
+				Log.d(TAG, "onWheelScrollStateChanged: " + state);
+			}
+		});
+
+		wheelPicker1.setOnActiveItemChangedListener(new WheelPicker.OnActiveItemChangedListener() {
+			@Override
+			public void onActiveItemChanged(WheelPicker picker, Object data, int position) {
+				wheelPicker1Active.setText(String.valueOf(position));
+			}
+		});
 	}
 }

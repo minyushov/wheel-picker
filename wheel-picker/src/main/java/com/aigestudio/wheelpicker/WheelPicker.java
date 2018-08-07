@@ -70,6 +70,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
    */
   private OnItemSelectedListener mOnItemSelectedListener;
   private OnWheelChangeListener mOnWheelChangeListener;
+  private OnActiveItemChangedListener mOnActiveItemChangedListener;
 
   private Rect mRectDrawn;
   private Rect mRectIndicatorHead, mRectIndicatorFoot;
@@ -180,6 +181,11 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
    * @see #getCurrentItemPosition()
    */
   private int mCurrentItemPosition;
+
+  /**
+   * Position of item which places in selected position
+   */
+  private int mCurrentActiveItemPosition;
 
   /**
    * 滚轮滑动时可以滑动到的最小/最大的Y坐标
@@ -296,7 +302,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	mData = new ArrayList();
 	mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size,
 			getResources().getDimensionPixelSize(R.dimen.default_text_size));
-//	mVisibleItemCount = a.getInt(R.styleable.WheelPicker_wheel_visible_item_count, 7);
 	mItemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_height,
 			getResources().getDimensionPixelSize(R.dimen.default_item_height));
 	mSelectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
@@ -745,6 +750,15 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		mScrollOffsetY += move;
 		mLastPointY = (int) event.getY();
 		invalidate();
+
+		int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mData.size();
+		position = position < 0 ? position + mData.size() : position;
+
+		if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
+		  mCurrentActiveItemPosition = position;
+		  mOnActiveItemChangedListener.onActiveItemChanged(this, mData.get(position), position);
+		}
+
 		break;
 	  case MotionEvent.ACTION_UP:
 		if (null != getParent()) {
@@ -842,12 +856,14 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	if (null == mData || mData.size() == 0) {
 	  return;
 	}
+
+	int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mData.size();
+	position = position < 0 ? position + mData.size() : position;
+
 	if (mScroller.isFinished() && !isForceFinishScroll) {
 	  if (mItemHeight == 0) {
 		return;
 	  }
-	  int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mData.size();
-	  position = position < 0 ? position + mData.size() : position;
 	  if (isDebug) {
 		Log.i(TAG, position + ":" + mData.get(position) + ":" + mScrollOffsetY);
 	  }
@@ -859,10 +875,18 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		mOnWheelChangeListener.onWheelSelected(position);
 		mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
 	  }
+	  if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
+		mCurrentActiveItemPosition = position;
+		mOnActiveItemChangedListener.onActiveItemChanged(this, mData.get(position), position);
+	  }
 	}
 	if (mScroller.computeScrollOffset()) {
 	  if (null != mOnWheelChangeListener) {
 		mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING);
+	  }
+	  if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
+	    mCurrentActiveItemPosition = position;
+		mOnActiveItemChangedListener.onActiveItemChanged(this, mData.get(position), position);
 	  }
 	  mScrollOffsetY = mScroller.getCurrY();
 	  postInvalidate();
@@ -987,6 +1011,11 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
   @Override
   public void setOnWheelChangeListener(OnWheelChangeListener listener) {
 	mOnWheelChangeListener = listener;
+  }
+
+  @Override
+  public void setOnActiveItemChangedListener(OnActiveItemChangedListener listener) {
+	mOnActiveItemChangedListener = listener;
   }
 
   @Override
@@ -1203,6 +1232,21 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	 * 		当前选中的数据在数据列表中的位置
 	 */
 	void onItemSelected(WheelPicker picker, Object data, int position);
+  }
+
+  public interface OnActiveItemChangedListener {
+
+	/**
+	 * This method will be invoked on dragging or scrolling
+	 *
+	 * @param picker
+	 * 		滚轮选择器
+	 * @param data
+	 * 		当前选中的数据
+	 * @param position
+	 * 		Position of currently active item (item which places in selected position during drag or scroll)
+	 */
+	void onActiveItemChanged(WheelPicker picker, Object data, int position);
   }
 
   /**
