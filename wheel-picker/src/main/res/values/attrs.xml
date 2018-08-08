@@ -17,6 +17,5 @@
 			<enum name="left" value="1" />
 			<enum name="right" value="2" />
 		</attr>
-		<attr name="wheel_font_path" format="string" />
 	</declare-styleable>
 </resources>

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -48,6 +47,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	 * @see #setItemAlign(int)
 	 */
 	public static final int ALIGN_CENTER = 0, ALIGN_LEFT = 1, ALIGN_RIGHT = 2;
+
+	private static final int QUICK_SCROLL_VELOCITY = 10000;
+	private static final int TOUCH_SLOP = 4;
 
 	private static final String TAG = WheelPicker.class.getSimpleName();
 
@@ -135,11 +137,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	private int mItemHeight, mHalfItemHeight;
 
 	/**
-	 * 滚轮选择器内容区域高度的一半
-	 */
-	private int mHalfWheelHeight;
-
-	/**
 	 * 当前被选中的数据项所显示的数据在数据源中的位置
 	 *
 	 * @see #setSelectedItemPosition(int)
@@ -166,7 +163,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	/**
 	 * 滚轮滑动时的最小/最大速度
 	 */
-	private int mMinimumVelocity = 50, mMaximumVelocity = 8000, mQuickScrollVelocity = 10000;
+	private int mMinimumVelocity = 50, mMaximumVelocity = 8000;
 
 	/**
 	 * 滚轮选择器中心坐标
@@ -199,11 +196,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	private int mDownPointY;
 
 	/**
-	 * 点击与触摸的切换阀值
-	 */
-	private int mTouchSlop = 4;
-
-	/**
 	 * 滚轮选择器的每一个数据项文本是否拥有相同的宽度
 	 *
 	 * @see #setSameWidth(boolean)
@@ -226,12 +218,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	 * 是否为强制结束滑动
 	 */
 	private boolean isForceFinishScroll;
-
-	/**
-	 * Font typeface path from assets
-	 */
-	private String fontPath;
-
 	private boolean isDebug;
 
 	public WheelPicker(Context context) {
@@ -259,7 +245,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		mItemIconEnabled = a.getBoolean(R.styleable.WheelPicker_wheel_item_icon_enabled, false);
 		hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
 		mItemAlign = a.getInt(R.styleable.WheelPicker_wheel_item_align, ALIGN_CENTER);
-		fontPath = a.getString(R.styleable.WheelPicker_wheel_font_path);
 		a.recycle();
 
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -267,11 +252,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 		mSelectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
 		mSelectedPaint.setTextSize(mItemTextSize);
-
-		if (fontPath != null) {
-			Typeface typeface = Typeface.createFromAsset(context.getAssets(), fontPath);
-			setTypeface(typeface);
-		}
 
 		// 更新文本对齐方式
 		// Update alignment of text
@@ -429,8 +409,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		// 计算数据项绘制中心
 		// Correct item drawn center
 		computeDrawnCenter();
-
-		mHalfWheelHeight = mRectDrawn.height() / 2;
 
 		mVisibleItemCount = mRectDrawn.height() / mItemHeight;
 		updateVisibleItemCount();
@@ -608,7 +586,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				mDownPointY = mLastPointY = (int) event.getY();
 				break;
 			case MotionEvent.ACTION_MOVE:
-				if (Math.abs(mDownPointY - event.getY()) < mTouchSlop) {
+				if (Math.abs(mDownPointY - event.getY()) < TOUCH_SLOP) {
 					isClick = true;
 					break;
 				}
@@ -628,13 +606,13 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				mLastPointY = (int) event.getY();
 				invalidate();
 
-				int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
-				position = position < 0 ? position + mAdapter.getSize() : position;
+//				int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
+//				position = position < 0 ? position + mAdapter.getSize() : position;
 
-				if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
-					mCurrentActiveItemPosition = position;
-					mOnActiveItemChangedListener.onActiveItemChanged(this, mAdapter.getData().get(position), position);
-				}
+//				if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
+//					mCurrentActiveItemPosition = position;
+//					mOnActiveItemChangedListener.onActiveItemChanged(this, mAdapter.getData().get(position), position);
+//				}
 
 				break;
 			case MotionEvent.ACTION_UP:
@@ -653,9 +631,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				isForceFinishScroll = false;
 				int velocity = (int) mTracker.getYVelocity();
 
-
 				if (Math.abs(velocity) > mMinimumVelocity && !(mScrollOffsetY > mMaxFlingY) && !(mScrollOffsetY < mMinFlingY)) {
-					if (Math.abs(velocity) > mQuickScrollVelocity) {
+					if (Math.abs(velocity) > QUICK_SCROLL_VELOCITY) {
 						int dy = 0;
 
 						if (velocity > 0) {
@@ -675,7 +652,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 					mScroller.startScroll(0, mScrollOffsetY, 0,
 							computeDistanceToEndPoint(mScrollOffsetY % mItemHeight));
 				}
-
 
 				// 校正坐标
 				// Correct coordinates
@@ -722,13 +698,17 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 			return;
 		}
 
-		int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
-		position = position < 0 ? position + mAdapter.getSize() : position;
+//		int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
+//		position = position < 0 ? position + mAdapter.getSize() : position;
 
 		if (mScroller.isFinished() && !isForceFinishScroll) {
 			if (mItemHeight == 0) {
 				return;
 			}
+
+			int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
+			position = position < 0 ? position + mAdapter.getSize() : position;
+
 			if (isDebug) {
 				Log.i(TAG, position + ":" + mAdapter.getData().get(position) + ":" + mScrollOffsetY);
 			}
