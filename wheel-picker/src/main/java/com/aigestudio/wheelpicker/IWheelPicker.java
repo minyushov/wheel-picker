@@ -69,20 +69,11 @@ public interface IWheelPicker {
   void setCyclic(boolean isCyclic);
 
   /**
-   * 设置滚轮Item选中监听器
-   *
-   * @param listener
-   * 		滚轮Item选中监听器{@link WheelPicker.OnItemSelectedListener}
-   */
-  void setOnItemSelectedListener(WheelPicker.OnItemSelectedListener listener);
-
-  /**
    * 获取当前被选中的数据项所显示的数据在数据源中的位置
    * 需要注意的是，当滚轮选择器滚动时并不会改变该方法的返回值，该方法会始终返回
    * {@link #setSelectedItemPosition(int)}所设置的值，当且仅当调用
    * {@link #setSelectedItemPosition(int)}设置新值后，该方法所返回的值才会改变
    * 如果你只是想获取滚轮静止时当前被选中的数据项所显示的数据在数据源中的位置，你可以通过
-   * {@link com.aigestudio.wheelpicker.WheelPicker.OnItemSelectedListener}回调监听或调用
    * {@link #getCurrentItemPosition()}
    * <p>
    * Get the position of current selected item in data source
@@ -91,9 +82,6 @@ public interface IWheelPicker {
    * return will be changed if and only if call the
    * {@link #setSelectedItemPosition(int)}
    * set a new value
-   * If you only want to get the position of current selected item in data source, you can get it
-   * through {@link com.aigestudio.wheelpicker.WheelPicker.OnItemSelectedListener} or call
-   * {@link #getCurrentItemPosition()} directly
    *
    * @return 当前被选中的数据项所显示的数据在数据源中的位置
    */
@@ -106,9 +94,7 @@ public interface IWheelPicker {
    * 的相关数据参数，并将重置一系列的数据，重新将第三个数据作为滚轮选择器的起点，这个行为很可能会影响你之
    * 前所根据这些参数改变的一些属性，比如
    * {@link com.aigestudio.wheelpicker.WheelPicker.OnWheelChangeListener}和
-   * {@link com.aigestudio.wheelpicker.WheelPicker.OnItemSelectedListener}监听器中方法参数的值，因
    * 此你总该在调用该方法后考虑到相关影响
-   * 你总该为该方法传入一个大于等于0小于数据源{@link #getData()}长度
    * 的值，否则会抛出异常
    * 默认情况下，当前被选中的数据项所显示的数据在数据源中的位置为0
    * <p>
@@ -119,8 +105,6 @@ public interface IWheelPicker {
    * series of data, and make the position 3 as a new starting point of WheelPicker, this behavior
    * maybe influenced some attribute you set last time, such as parameters of method in
    * {@link com.aigestudio.wheelpicker.WheelPicker.OnWheelChangeListener} and
-   * {@link com.aigestudio.wheelpicker.WheelPicker.OnItemSelectedListener}, so you must always
-   * consider the influence when you call this method set a new value
    * You should always set a value which greater than or equal to 0 and less than data source's
    * length
    * By default, position of current selected item in data source is 0
@@ -141,34 +125,6 @@ public interface IWheelPicker {
    * @return 当前被选中的数据项所显示的数据在数据源中的位置
    */
   int getCurrentItemPosition();
-
-  /**
-   * 获取数据列表
-   * <p>
-   * Get data source of WheelPicker
-   *
-   * @return 数据列表
-   */
-  List getData();
-
-  /**
-   * 设置数据列表
-   * 数据源可以是任意类型，但是需要注意的是WheelPicker在绘制数据的时候会将数据转换成String类型
-   * 在没有设置数据源的情况下滚轮选择器会设置一个默认的数据源作为展示
-   * 为滚轮选择器设置数据源会重置滚轮选择器的各项状态，具体行为参考
-   * {@link #setSelectedItemPosition(int)}
-   * <p>
-   * Set data source of WheelPicker
-   * The data source can be any type, WheelPicker will change the data to string when it draw the
-   * item.
-   * There is a default data source when you not set the data source for WheelPicker.
-   * Set data source for WheelPicker will reset state of it, you can refer to
-   * {@link #setSelectedItemPosition(int)} for more details.
-   *
-   * @param data
-   * 		数据列表
-   */
-  void setData(List data);
 
   /**
    * 设置数据项是否有相同的宽度

@@ -2,10 +2,11 @@ package com.example.sample;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import com.aigestudio.wheelpicker.WheelAdapter;
+import com.aigestudio.wheelpicker.WheelItem;
 import com.aigestudio.wheelpicker.WheelPicker;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,74 +19,50 @@ public class SampleActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sample);
 
-		ArrayList<String> data = new ArrayList<>();
-		data.add("Text 1");
-		data.add("Text 2");
-		data.add("Text 3");
-		data.add("Text 4");
-		data.add("Text 5");
-		data.add("Text 6");
-		data.add("Text 7");
-		data.add("Text 8");
-		data.add("Text 9");
-		data.add("Text 10");
-		data.add("Text 11");
-		data.add("Text 12");
-		data.add("Text 13");
-		data.add("Text 14");
-		data.add("Text 15");
-		data.add("Text 16");
-		data.add("Text 17");
-		data.add("Text 18");
-		data.add("Text 19");
-		data.add("Text 20");
-		data.add("Text 21");
-		data.add("Text 22");
-		data.add("Text 23");
-		data.add("Text 24");
-		data.add("Text 25");
+		ArrayList<WheelItem<String>> data = new ArrayList<>();
+		data.add(new WheelItem<>("Text 1"));
+		data.add(new WheelItem<>("Text 2"));
+		data.add(new WheelItem<>("Text 3"));
+		data.add(new WheelItem<>("Text 4"));
+		data.add(new WheelItem<>("Text 5"));
+		data.add(new WheelItem<>("Text 6"));
+		data.add(new WheelItem<>("Text 7"));
+		data.add(new WheelItem<>("Text 8"));
+		data.add(new WheelItem<>("Text 9"));
+		data.add(new WheelItem<>("Text 10"));
+		data.add(new WheelItem<>("Text 11"));
+		data.add(new WheelItem<>(getResources(), "Text 12", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>(getResources(), "Text 13", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>(getResources(), "Text 14", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>(getResources(), "Text 15", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>(getResources(), "Text 16", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>(getResources(), "Text 17", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>(getResources(), "Text 18", android.R.drawable.ic_delete));
+		data.add(new WheelItem<>("Text 19"));
+		data.add(new WheelItem<>("Text 20"));
+		data.add(new WheelItem<>("Text 21"));
+		data.add(new WheelItem<>("Text 22"));
+		data.add(new WheelItem<>("Text 23"));
+		data.add(new WheelItem<>("Text 24"));
+		data.add(new WheelItem<>("Text 25"));
 
-		WheelPicker wheelPicker1 = findViewById(R.id.wheel_picker_1);
-		WheelPicker wheelPicker2 = findViewById(R.id.wheel_picker_2);
+//		WheelPicker wheelPicker1 = findViewById(R.id.wheel_picker_1);
+//		WheelPicker wheelPicker2 = findViewById(R.id.wheel_picker_2);
 		WheelPicker wheelPicker3 = findViewById(R.id.wheel_picker_3);
-		WheelPicker wheelPicker4 = findViewById(R.id.wheel_picker_4);
+//		WheelPicker wheelPicker4 = findViewById(R.id.wheel_picker_4);
 
-		wheelPicker1.setData(data);
-		wheelPicker2.setData(data);
-		wheelPicker3.setData(data);
-		wheelPicker4.setData(data);
-
-		final TextView wheelPicker1Active = findViewById(R.id.wheel_picker_1_active);
-
-		wheelPicker1.setOnItemSelectedListener(new WheelPicker.OnItemSelectedListener() {
+		WheelAdapter<String> adapter = new WheelAdapter<>();
+		adapter.setData(data);
+		adapter.setOnItemSelectedListener(new WheelAdapter.OnItemSelectedListener<String>() {
 			@Override
-			public void onItemSelected(WheelPicker picker, Object data, int position) {
-				Log.d(TAG, "onItemSelected: " + data.toString());
+			public void onItemSelected(String item) {
+				Log.d(TAG, "onItemSelected: " + item);
 			}
 		});
+		adapter.bind(wheelPicker3);
 
-		wheelPicker1.setOnWheelChangeListener(new WheelPicker.OnWheelChangeListener() {
-			@Override
-			public void onWheelScrolled(int offset) {
-//			Log.d(TAG, "onWheelScrolled: " + offset);
-			}
-
-			@Override
-			public void onWheelSelected(int position) {
-				Log.d(TAG, "onWheelSelected: " + position);
-			}
-
-			@Override
-			public void onWheelScrollStateChanged(int state) {
-				Log.d(TAG, "onWheelScrollStateChanged: " + state);
-			}
-		});
-
-		wheelPicker1.setOnActiveItemChangedListener(new WheelPicker.OnActiveItemChangedListener() {
-			@Override
-			public void onActiveItemChanged(WheelPicker picker, Object data, int position) {
-				wheelPicker1Active.setText(String.valueOf(position));
-			}
-		});
+//		wheelPicker1.setData(data);
+//		wheelPicker2.setData(data);
+//		wheelPicker4.setData(data);
 	}
 }
