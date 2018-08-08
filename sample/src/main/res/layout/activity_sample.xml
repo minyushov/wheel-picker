@@ -12,6 +12,7 @@
 		android:id="@+id/wheel_picker_1"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
+		android:visibility="gone"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@id/wheel_picker_2"
 		app:layout_constraintStart_toStartOf="parent"
@@ -24,6 +25,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textColor="@android:color/black"
+		android:visibility="gone"
 		app:layout_constraintBottom_toBottomOf="@id/wheel_picker_1"
 		app:layout_constraintEnd_toEndOf="@id/wheel_picker_1"
 		app:layout_constraintHorizontal_bias="0.8"
@@ -34,6 +36,7 @@
 		android:id="@+id/wheel_picker_2"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
+		android:visibility="gone"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@id/wheel_picker_3"
 		app:layout_constraintStart_toEndOf="@id/wheel_picker_1"
@@ -52,12 +55,14 @@
 		app:layout_constraintTop_toTopOf="parent"
 		app:wheel_atmospheric="true"
 		app:wheel_item_height="35dp"
+		app:wheel_item_icon_enabled="true"
 		app:wheel_selected_item_text_color="@android:color/holo_red_dark" />
 
 	<com.aigestudio.wheelpicker.WheelPicker
 		android:id="@+id/wheel_picker_4"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
+		android:visibility="gone"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toEndOf="@id/wheel_picker_2"
