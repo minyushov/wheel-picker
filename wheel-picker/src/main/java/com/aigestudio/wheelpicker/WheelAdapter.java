@@ -5,13 +5,19 @@ import java.util.List;
 public final class WheelAdapter<T> {
 	private List<WheelItem<T>> data;
 	private OnItemSelectedListener<T> onItemSelectedListener;
+	private WheelPicker wheelPicker;
 
 	public void bind(WheelPicker wheelPicker) {
+		this.wheelPicker = wheelPicker;
 		wheelPicker.setAdapter(this);
 	}
 
 	public void setData(List<WheelItem<T>> data) {
 		this.data = data;
+
+		if (wheelPicker != null) {
+			wheelPicker.setAdapter(this);
+		}
 	}
 
 	public List<WheelItem<T>> getData() {
