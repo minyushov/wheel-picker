@@ -66,7 +66,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	private boolean isTouchTriggered;
 
 	private OnWheelChangeListener mOnWheelChangeListener;
-	private OnActiveItemChangedListener mOnActiveItemChangedListener;
 
 	private Rect mRectDrawn;
 	private Rect mRectCurrentItem;
@@ -149,11 +148,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	 * @see #getCurrentItemPosition()
 	 */
 	private int mCurrentItemPosition;
-
-	/**
-	 * Position of item which places in selected position
-	 */
-	private int mCurrentActiveItemPosition;
 
 	/**
 	 * 滚轮滑动时可以滑动到的最小/最大的Y坐标
@@ -273,11 +267,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 		mRectCurrentItem = new Rect();
 
-//		mPaint.setColor(mItemTextColor);
 		mPaint.setColorFilter(new PorterDuffColorFilter(mItemTextColor, PorterDuff.Mode.SRC_IN));
 		mPaint.setStyle(Paint.Style.FILL);
 
-//		mSelectedPaint.setColor(mSelectedItemTextColor);
 		mSelectedPaint.setColorFilter(new PorterDuffColorFilter(mSelectedItemTextColor, PorterDuff.Mode.SRC_IN));
 		mSelectedPaint.setStyle(Paint.Style.FILL);
 	}
@@ -606,14 +598,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				mLastPointY = (int) event.getY();
 				invalidate();
 
-//				int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
-//				position = position < 0 ? position + mAdapter.getSize() : position;
-
-//				if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
-//					mCurrentActiveItemPosition = position;
-//					mOnActiveItemChangedListener.onActiveItemChanged(this, mAdapter.getData().get(position), position);
-//				}
-
 				break;
 			case MotionEvent.ACTION_UP:
 				if (null != getParent()) {
@@ -698,9 +682,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 			return;
 		}
 
-//		int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
-//		position = position < 0 ? position + mAdapter.getSize() : position;
-
 		if (mScroller.isFinished() && !isForceFinishScroll) {
 			if (mItemHeight == 0) {
 				return;
@@ -720,19 +701,11 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				mOnWheelChangeListener.onWheelSelected(position);
 				mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
 			}
-//			if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
-//				mCurrentActiveItemPosition = position;
-//				mOnActiveItemChangedListener.onActiveItemChanged(this, mData.get(position), position);
-//			}
 		}
 		if (mScroller.computeScrollOffset()) {
 			if (null != mOnWheelChangeListener) {
 				mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING);
 			}
-//			if (mOnActiveItemChangedListener != null && position != mCurrentActiveItemPosition) {
-//				mCurrentActiveItemPosition = position;
-//				mOnActiveItemChangedListener.onActiveItemChanged(this, mData.get(position), position);
-//			}
 			mScrollOffsetY = mScroller.getCurrY();
 			postInvalidate();
 			mHandler.postDelayed(this, 16);
@@ -756,17 +729,15 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		requestLayout();
 	}
 
-	@Override
-	public int getSelectedItemPosition() {
+	int getSelectedItemPosition() {
 		return mSelectedItemPosition;
 	}
 
-	@Override
-	public void setSelectedItemPosition(int position) {
+	void setSelectedItemPosition(int position) {
 		setSelectedItemPosition(position, true);
 	}
 
-	public void setSelectedItemPosition(int position, final boolean animated) {
+	void setSelectedItemPosition(int position, final boolean animated) {
 		isTouchTriggered = false;
 		if (animated && mScroller.isFinished()) { // We go non-animated regardless of "animated" parameter if scroller is in motion
 			int itemDifference = position - mCurrentItemPosition;
@@ -791,8 +762,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		}
 	}
 
-	@Override
-	public int getCurrentItemPosition() {
+	int getCurrentItemPosition() {
 		return mCurrentItemPosition;
 	}
 
@@ -830,11 +800,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	@Override
 	public void setOnWheelChangeListener(OnWheelChangeListener listener) {
 		mOnWheelChangeListener = listener;
-	}
-
-	@Override
-	public void setOnActiveItemChangedListener(OnActiveItemChangedListener listener) {
-		mOnActiveItemChangedListener = listener;
 	}
 
 	@Override
@@ -963,21 +928,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		computeTextSize();
 		requestLayout();
 		invalidate();
-	}
-
-	public interface OnActiveItemChangedListener {
-
-		/**
-		 * This method will be invoked on dragging or scrolling
-		 *
-		 * @param picker
-		 * 		滚轮选择器
-		 * @param data
-		 * 		当前选中的数据
-		 * @param position
-		 * 		Position of currently active item (item which places in selected position during drag or scroll)
-		 */
-		void onActiveItemChanged(WheelPicker picker, Object data, int position);
 	}
 
 	/**

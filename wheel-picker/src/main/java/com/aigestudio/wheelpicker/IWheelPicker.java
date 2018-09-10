@@ -47,64 +47,6 @@ public interface IWheelPicker {
   void setVisibleItemCount(int count);
 
   /**
-   * 获取当前被选中的数据项所显示的数据在数据源中的位置
-   * 需要注意的是，当滚轮选择器滚动时并不会改变该方法的返回值，该方法会始终返回
-   * {@link #setSelectedItemPosition(int)}所设置的值，当且仅当调用
-   * {@link #setSelectedItemPosition(int)}设置新值后，该方法所返回的值才会改变
-   * 如果你只是想获取滚轮静止时当前被选中的数据项所显示的数据在数据源中的位置，你可以通过
-   * {@link #getCurrentItemPosition()}
-   * <p>
-   * Get the position of current selected item in data source
-   * Notice:The value by return will not change when WheelPicker scroll, this method will always
-   * return the value which {@link #setSelectedItemPosition(int)} set, the value this method
-   * return will be changed if and only if call the
-   * {@link #setSelectedItemPosition(int)}
-   * set a new value
-   *
-   * @return 当前被选中的数据项所显示的数据在数据源中的位置
-   */
-  int getSelectedItemPosition();
-
-  /**
-   * 设置当前被选中的数据项所显示的数据在数据源中的位置
-   * 调用该方法会导致滚动选择器的位置被重新初始化，什么意思呢？假如你滑动选择到第五个数据项的时候调用该方
-   * 法重新将当前被选中的数据项所显示的数据在数据源中的位置设置为第三个，那么滚轮选择器会清除掉上一次滚动
-   * 的相关数据参数，并将重置一系列的数据，重新将第三个数据作为滚轮选择器的起点，这个行为很可能会影响你之
-   * 前所根据这些参数改变的一些属性，比如
-   * {@link com.aigestudio.wheelpicker.WheelPicker.OnWheelChangeListener}和
-   * 此你总该在调用该方法后考虑到相关影响
-   * 的值，否则会抛出异常
-   * 默认情况下，当前被选中的数据项所显示的数据在数据源中的位置为0
-   * <p>
-   * Set the position of current selected item in data source
-   * Call this method and set a new value may be reinitialize the location of WheelPicker. For
-   * example, you call this method after scroll the WheelPicker and set selected item position
-   * with a new value, WheelPicker will clear the related parameters last scroll set and reset
-   * series of data, and make the position 3 as a new starting point of WheelPicker, this behavior
-   * maybe influenced some attribute you set last time, such as parameters of method in
-   * {@link com.aigestudio.wheelpicker.WheelPicker.OnWheelChangeListener} and
-   * You should always set a value which greater than or equal to 0 and less than data source's
-   * length
-   * By default, position of current selected item in data source is 0
-   *
-   * @param position
-   * 		当前被选中的数据项所显示的数据在数据源中的位置
-   */
-  void setSelectedItemPosition(int position);
-
-  /**
-   * 获取当前被选中的数据项所显示的数据在数据源中的位置
-   * 与{@link #getSelectedItemPosition()}不同的是，该方法所返回的结果会因为滚轮选择器的改变而改变
-   * <p>
-   * Get the position of current selected item in data source
-   * The difference between {@link #getSelectedItemPosition()}, the value this method return will
-   * change by WheelPicker scrolled
-   *
-   * @return 当前被选中的数据项所显示的数据在数据源中的位置
-   */
-  int getCurrentItemPosition();
-
-  /**
    * 设置数据项是否有相同的宽度
    * 滚轮选择器在确定尺寸大小时会通过遍历数据源来计算每一条数据文本的宽度以找到最宽的文本作为滚轮选择器的
    * 最终宽度，当数据源的数据非常多时，这个过程可能会消耗大量的时间导致效率降低，而且在大部分数据量多情况
@@ -153,13 +95,6 @@ public interface IWheelPicker {
    * @see com.aigestudio.wheelpicker.WheelPicker.OnWheelChangeListener
    */
   void setOnWheelChangeListener(WheelPicker.OnWheelChangeListener listener);
-
-
-  /**
-   * @param listener
-   * 		{@link com.aigestudio.wheelpicker.WheelPicker.OnActiveItemChangedListener}
-   */
-  void setOnActiveItemChangedListener(WheelPicker.OnActiveItemChangedListener listener);
 
   /**
    * 获取最宽的文本

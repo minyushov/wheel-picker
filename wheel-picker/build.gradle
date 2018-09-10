@@ -8,8 +8,8 @@ android {
 	defaultConfig {
 		minSdkVersion 19
 		targetSdkVersion 28
-		versionCode 1
-		versionName "0.0.1"
+		versionCode 2
+		versionName "0.0.2"
 	}
 
 	buildTypes {
@@ -25,7 +25,7 @@ bintrayUpload {
 	repo = "android"
 	organization = "mercdev"
 	groupId = "com.mercdev.android"
-	version = "0.0.1"
+	version = "0.0.2"
 	vcsUrl = "https://github.com/minyushov/WheelPicker.git"
 	license = "Apache-2.0"
 	docs = false
