@@ -32,7 +32,7 @@ public final class WheelAdapter<T> {
 	}
 
 	/**
-	 * @return selected item position in wheel's idle state
+	 * @return selected item position which was set by {@link WheelAdapter#setSelectedItemPosition(int)}
 	 */
 	public int getSelectedItemPosition() {
 		return wheelPicker.getSelectedItemPosition();
@@ -55,14 +55,6 @@ public final class WheelAdapter<T> {
 
 	public void setOnItemSelectedListener(OnItemSelectedListener<T> onItemSelectedListener) {
 		this.onItemSelectedListener = onItemSelectedListener;
-	}
-
-	public WheelItem<T> getSelectedItem() {
-		if (data == null || data.size() == 0 || wheelPicker.getSelectedItemPosition() >= data.size()) {
-			return null;
-		}
-
-		return data.get(wheelPicker.getSelectedItemPosition());
 	}
 
 	public WheelItem<T> getCurrentItem() {

@@ -33,12 +33,18 @@ public final class WheelItem<T> {
 
 	@Override
 	public String toString() {
-		return data.toString();
+		if (data != null) {
+			return data.toString();
+		} else {
+			return "";
+		}
 	}
 
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
-		icon.recycle();
+		if (icon != null) {
+			icon.recycle();
+		}
 	}
 }
