@@ -478,7 +478,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 			int iconTop = 0;
 
 			if (icon != null) {
-				iconLeft = mDrawnCenterX - mTextMaxWidth;
+				iconLeft = mDrawnCenterX - icon.getWidth() * 2;
 				iconTop = mWheelCenterY + (drawnOffsetPos * mItemHeight) + mScrollOffsetY % mItemHeight - icon.getHeight() / 2;
 			}
 

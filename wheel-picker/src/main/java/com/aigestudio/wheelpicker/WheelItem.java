@@ -20,7 +20,11 @@ public final class WheelItem<T> {
 
 	public WheelItem(T data, Bitmap bitmap) {
 		this.data = data;
-		this.icon = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+		if (bitmap == null) {
+			icon = null;
+		} else {
+			this.icon = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+		}
 	}
 
 	public T getData() {
