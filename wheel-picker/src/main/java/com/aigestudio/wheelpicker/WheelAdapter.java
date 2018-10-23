@@ -12,13 +12,33 @@ public final class WheelAdapter<T> {
 		wheelPicker.setAdapter(this);
 	}
 
+	/**
+	 * Apply new {@code data} to {@link WheelPicker} and select first item without animation
+	 *
+	 */
 	public void setData(List<WheelItem<T>> data) {
+		setData(data, 0);
+	}
+
+	/**
+	 * Apply new {@code data} to {@link WheelPicker} and select item with this {@code position} without animation
+	 *
+	 */
+	public void setData(List<WheelItem<T>> data, int selectedItemPosition) {
+		setData(data, selectedItemPosition, false);
+	}
+
+	/**
+	 * Apply new {@code data} to {@link WheelPicker} and select item with this {@code position} with animation if animated == true
+	 *
+	 */
+	public void setData(List<WheelItem<T>> data, int selectedItemPosition, boolean animated) {
 		this.data = data;
 
 		if (wheelPicker != null) {
 			wheelPicker.setAdapter(this);
-			if (data.size() > 0) {
-				wheelPicker.setSelectedItemPosition(0, false);
+			if (selectedItemPosition < data.size()) {
+				wheelPicker.setSelectedItemPosition(selectedItemPosition, animated);
 			}
 		}
 	}
