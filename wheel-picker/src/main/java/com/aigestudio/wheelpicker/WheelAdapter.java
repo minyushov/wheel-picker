@@ -78,7 +78,7 @@ public final class WheelAdapter<T> {
 	}
 
 	public WheelItem<T> getCurrentItem() {
-		if (data == null || data.size() == 0 || wheelPicker.getCurrentItemPosition() >= data.size()) {
+		if (data == null || data.size() == 0 || wheelPicker.getCurrentItemPosition() >= data.size() || wheelPicker.getCurrentItemPosition() < 0) {
 			return null;
 		}
 
@@ -86,7 +86,7 @@ public final class WheelAdapter<T> {
 	}
 
 	void onItemSelected(int position) {
-		if (onItemSelectedListener != null && data != null && position < data.size()) {
+		if (onItemSelectedListener != null && data != null && position < data.size() && position >= 0) {
 			onItemSelectedListener.onItemSelected(data.get(position).getData());
 		}
 	}
