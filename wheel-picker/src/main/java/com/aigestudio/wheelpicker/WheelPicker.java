@@ -20,7 +20,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
-public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable {
+public class WheelPicker extends View implements Runnable {
 	public static final int SCROLL_STATE_IDLE = 0;
 	public static final int SCROLL_STATE_DRAGGING = 1;
 	public static final int SCROLL_STATE_SCROLLING = 2;
@@ -598,17 +598,20 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		}
 	}
 
-	@Override
-	public void setDebug(boolean isDebug) {
-		this.isDebug = isDebug;
-	}
-
-	@Override
+	/**
+	 * Get the count of current visible items in WheelPicker
+	 */
 	public int getVisibleItemCount() {
 		return mVisibleItemCount;
 	}
 
-	@Override
+	/**
+	 * Set the count of current visible items in WheelPicker
+	 * The count of current visible items in WheelPicker must greater than 1
+	 * Notice:count of current visible items in WheelPicker will always is an odd number, even you
+	 * can set an even number for it, it will be change to an odd number eventually
+	 * By default, the count of current visible items in WheelPicker is 7
+	 */
 	public void setVisibleItemCount(int count) {
 		mVisibleItemCount = count;
 		updateVisibleItemCount();
@@ -670,6 +673,21 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
+	/**
+	 * Set items of WheelPicker if has same width
+	 * WheelPicker will traverse the data source to calculate each data text width to find out the
+	 * maximum text width for the final view width, this process maybe spends a lot of time and
+	 * reduce efficiency when data source has large amount data, in most large amount data case,
+	 * data text always has same width, you can call this method tell to WheelPicker your data
+	 * source has same width to save time and improve efficiency.
+	 * Sometimes the data source you set is positively has different text width, but maybe you know
+	 * the maximum width text's position in data source, then you can call
+	 * {@link #setMaximumWidthTextPosition(int)} tell to WheelPicker where is the maximum width text
+	 * in data source, WheelPicker will calculate its width base on this text which found by
+	 * position. If you don't know the position of maximum width text in data source, but you have
+	 * maximum width text, you can call {@link #setMaximumWidthText(String)} tell to WheelPicker
+	 * what maximum width text is directly, WheelPicker will calculate its width base on this text.
+	 */
 	public void setSameWidth(boolean hasSameWidth) {
 		this.hasSameWidth = hasSameWidth;
 		computeTextSize();
@@ -677,22 +695,21 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
-	@Override
+	/**
+	 * Whether items has same width or not
+	 */
 	public boolean hasSameWidth() {
 		return hasSameWidth;
 	}
 
-	@Override
 	public void setOnWheelChangeListener(OnWheelChangeListener listener) {
 		mOnWheelChangeListener = listener;
 	}
 
-	@Override
 	public String getMaximumWidthText() {
 		return mMaxWidthText;
 	}
 
-	@Override
 	public void setMaximumWidthText(String text) {
 		if (null == text) {
 			throw new NullPointerException("Maximum width text can not be null!");
@@ -703,12 +720,16 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
-	@Override
+	/**
+	 * Get the position of maximum width text in data source
+	 */
 	public int getMaximumWidthTextPosition() {
 		return mTextMaxWidthPosition;
 	}
 
-	@Override
+	/**
+	 * Set the position of maximum width text in data source
+	 */
 	public void setMaximumWidthTextPosition(int position) {
 		if (!isPosInRang(position)) {
 			throw new ArrayIndexOutOfBoundsException("Maximum width text Position must in [0, " +
@@ -720,35 +741,29 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
-	@Override
 	public int getSelectedItemTextColor() {
 		return mSelectedItemTextColor;
 	}
 
-	@Override
 	public void setSelectedItemTextColor(int color) {
 		mSelectedItemTextColor = color;
 		computeCurrentItemRect();
 		invalidate();
 	}
 
-	@Override
 	public int getItemTextColor() {
 		return mItemTextColor;
 	}
 
-	@Override
 	public void setItemTextColor(int color) {
 		mItemTextColor = color;
 		invalidate();
 	}
 
-	@Override
 	public int getItemTextSize() {
 		return mItemTextSize;
 	}
 
-	@Override
 	public void setItemTextSize(int size) {
 		mItemTextSize = size;
 		mPaint.setTextSize(mItemTextSize);
@@ -758,35 +773,36 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
-	@Override
 	public int getItemSpace() {
 		return mItemSpace;
 	}
 
-	@Override
 	public void setItemSpace(int space) {
 		mItemSpace = space;
 		requestLayout();
 		invalidate();
 	}
 
-	@Override
+	/**
+	 * Set whether WheelPicker has atmospheric or not
+	 * WheelPicker's items will be transparent from center to ends if atmospheric display
+	 */
 	public void setAtmospheric(boolean hasAtmospheric) {
 		this.hasAtmospheric = hasAtmospheric;
 		invalidate();
 	}
 
-	@Override
+	/**
+	 * Whether WheelPicker has atmospheric or not
+	 */
 	public boolean hasAtmospheric() {
 		return hasAtmospheric;
 	}
 
-	@Override
 	public int getItemAlign() {
 		return mItemAlign;
 	}
 
-	@Override
 	public void setItemAlign(int align) {
 		mItemAlign = align;
 		updateItemTextAlign();
@@ -794,7 +810,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
-	@Override
 	public Typeface getTypeface() {
 		if (null != mPaint) {
 			return mPaint.getTypeface();
@@ -802,7 +817,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		return null;
 	}
 
-	@Override
 	public void setTypeface(Typeface tf) {
 		if (null != mPaint) {
 			mPaint.setTypeface(tf);
