@@ -5,7 +5,7 @@ buildscript {
 		maven { url 'https://dl.bintray.com/minyushov/gradle' }
 	}
 	dependencies {
-		classpath('com.android.tools.build:gradle:3.3.0-beta04')
+		classpath('com.android.tools.build:gradle:3.2.1')
 		classpath("com.minyushov.gradle:bintray:1.1.0")
 	}
 }

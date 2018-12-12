@@ -3,20 +3,9 @@ apply plugin: 'com.minyushov.bintray'
 
 android {
 	compileSdkVersion 28
-	buildToolsVersion '28.0.2'
-
 	defaultConfig {
 		minSdkVersion 19
 		targetSdkVersion 28
-		versionCode 4
-		versionName "0.0.4"
-	}
-
-	buildTypes {
-		release {
-			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-		}
 	}
 }
 

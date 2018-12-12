@@ -6,3 +6,5 @@
 /build
 /captures
 /publish.gradle
+*.iml
+.idea/caches
