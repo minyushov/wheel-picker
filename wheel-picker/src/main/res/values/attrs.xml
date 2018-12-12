@@ -14,10 +14,5 @@
 		<attr name="wheel_item_icon_size" format="dimension" />
 		<attr name="wheel_item_icon_padding" format="dimension" />
 		<attr name="wheel_atmospheric" format="boolean" />
-		<attr name="wheel_item_align" format="enum">
-			<enum name="center" value="0" />
-			<enum name="left" value="1" />
-			<enum name="right" value="2" />
-		</attr>
 	</declare-styleable>
 </resources>

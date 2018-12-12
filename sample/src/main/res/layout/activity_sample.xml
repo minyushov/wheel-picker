@@ -21,7 +21,6 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
 		app:wheel_atmospheric="true"
-		app:wheel_item_align="center"
 		app:wheel_item_height="44dp"
 		app:wheel_item_icon_enabled="true"
 		app:wheel_item_icon_padding="4dp"

@@ -25,10 +25,6 @@ public class WheelPicker extends View implements Runnable {
 	public static final int SCROLL_STATE_DRAGGING = 1;
 	public static final int SCROLL_STATE_SCROLLING = 2;
 
-	public static final int ALIGN_CENTER = 0;
-	public static final int ALIGN_LEFT = 1;
-	public static final int ALIGN_RIGHT = 2;
-
 	private static final int QUICK_SCROLL_VELOCITY = 10000;
 	private static final int TOUCH_SLOP = 4;
 
@@ -77,8 +73,6 @@ public class WheelPicker extends View implements Runnable {
 
 	private final int mItemIconSize;
 	private final int mItemIconPadding;
-
-	private int mItemAlign;
 
 	private int mItemHeight, mHalfItemHeight;
 
@@ -138,17 +132,15 @@ public class WheelPicker extends View implements Runnable {
 			mItemIconPadding = 0;
 		}
 		hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
-		mItemAlign = a.getInt(R.styleable.WheelPicker_wheel_item_align, ALIGN_CENTER);
 		a.recycle();
 
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
 		mPaint.setTextSize(mItemTextSize);
+		mPaint.setTextAlign(Paint.Align.CENTER);
 
 		mSelectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
 		mSelectedPaint.setTextSize(mItemTextSize);
-
-		// Update alignment of text
-		updateItemTextAlign();
+		mSelectedPaint.setTextAlign(Paint.Align.CENTER);
 
 		// Correct sizes of text
 		computeTextSize();
@@ -231,23 +223,6 @@ public class WheelPicker extends View implements Runnable {
 		);
 	}
 
-	private void updateItemTextAlign() {
-		switch (mItemAlign) {
-			case ALIGN_LEFT:
-				mPaint.setTextAlign(Paint.Align.LEFT);
-				mSelectedPaint.setTextAlign(Paint.Align.LEFT);
-				break;
-			case ALIGN_RIGHT:
-				mPaint.setTextAlign(Paint.Align.RIGHT);
-				mSelectedPaint.setTextAlign(Paint.Align.RIGHT);
-				break;
-			default:
-				mPaint.setTextAlign(Paint.Align.CENTER);
-				mSelectedPaint.setTextAlign(Paint.Align.CENTER);
-				break;
-		}
-	}
-
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int modeWidth = MeasureSpec.getMode(widthMeasureSpec);
@@ -322,17 +297,7 @@ public class WheelPicker extends View implements Runnable {
 	}
 
 	private void computeDrawnCenter() {
-		switch (mItemAlign) {
-			case ALIGN_LEFT:
-				mDrawnCenterX = mRectDrawn.left;
-				break;
-			case ALIGN_RIGHT:
-				mDrawnCenterX = mRectDrawn.right;
-				break;
-			default:
-				mDrawnCenterX = mWheelCenterX;
-				break;
-		}
+		mDrawnCenterX = mWheelCenterX;
 		mDrawnCenterY = (int) (mWheelCenterY - ((mPaint.ascent() + mPaint.descent()) / 2));
 	}
 
@@ -685,7 +650,7 @@ public class WheelPicker extends View implements Runnable {
 	 * {@link #setMaximumWidthTextPosition(int)} tell to WheelPicker where is the maximum width text
 	 * in data source, WheelPicker will calculate its width base on this text which found by
 	 * position. If you don't know the position of maximum width text in data source, but you have
-	 * maximum width text, you can call {@link #setMaximumWidthText(String)} tell to WheelPicker
+	 * maximum width text, you can call {@link #setMaximumWidthText} tell to WheelPicker
 	 * what maximum width text is directly, WheelPicker will calculate its width base on this text.
 	 */
 	public void setSameWidth(boolean hasSameWidth) {
@@ -797,17 +762,6 @@ public class WheelPicker extends View implements Runnable {
 	 */
 	public boolean hasAtmospheric() {
 		return hasAtmospheric;
-	}
-
-	public int getItemAlign() {
-		return mItemAlign;
-	}
-
-	public void setItemAlign(int align) {
-		mItemAlign = align;
-		updateItemTextAlign();
-		computeDrawnCenter();
-		invalidate();
 	}
 
 	public Typeface getTypeface() {
