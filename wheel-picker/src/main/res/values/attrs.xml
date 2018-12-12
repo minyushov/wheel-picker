@@ -11,6 +11,8 @@
 		<attr name="wheel_item_height" format="dimension" />
 		<attr name="wheel_item_space" format="dimension" />
 		<attr name="wheel_item_icon_enabled" format="boolean" />
+		<attr name="wheel_item_icon_size" format="dimension" />
+		<attr name="wheel_item_icon_padding" format="dimension" />
 		<attr name="wheel_atmospheric" format="boolean" />
 		<attr name="wheel_item_align" format="enum">
 			<enum name="center" value="0" />

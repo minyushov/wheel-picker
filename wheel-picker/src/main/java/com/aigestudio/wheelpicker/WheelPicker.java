@@ -67,8 +67,12 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 	private OnWheelChangeListener mOnWheelChangeListener;
 
-	private Rect mRectDrawn;
-	private Rect mRectCurrentItem;
+	private final Rect mRectDrawn = new Rect();
+	private final Rect mRectCurrentItem = new Rect();
+
+	private final Rect rectContent = new Rect();
+	private final Rect rectIcon = new Rect();
+	private final Rect rectText = new Rect();
 
 	private WheelAdapter mAdapter;
 
@@ -121,7 +125,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 	private boolean mItemIconEnabled;
 
-	private int mItemIconSize;
+	private final int mItemIconSize;
+	private final int mItemIconPadding;
 
 	/**
 	 * 数据项对齐方式
@@ -237,6 +242,13 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		mItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_item_text_color, 0xFF888888);
 		mItemSpace = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_space, 0);
 		mItemIconEnabled = a.getBoolean(R.styleable.WheelPicker_wheel_item_icon_enabled, false);
+		if (mItemIconEnabled) {
+			mItemIconSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_icon_size, 0);
+			mItemIconPadding = a.getDimensionPixelOffset(R.styleable.WheelPicker_wheel_item_icon_padding, 0);
+		} else {
+			mItemIconSize = 0;
+			mItemIconPadding = 0;
+		}
 		hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
 		mItemAlign = a.getInt(R.styleable.WheelPicker_wheel_item_align, ALIGN_CENTER);
 		a.recycle();
@@ -262,10 +274,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		ViewConfiguration conf = ViewConfiguration.get(getContext());
 		mMinimumVelocity = conf.getScaledMinimumFlingVelocity();
 		mMaximumVelocity = conf.getScaledMaximumFlingVelocity();
-
-		mRectDrawn = new Rect();
-
-		mRectCurrentItem = new Rect();
 
 		mPaint.setColorFilter(new PorterDuffColorFilter(mItemTextColor, PorterDuff.Mode.SRC_IN));
 		mPaint.setStyle(Paint.Style.FILL);
@@ -310,9 +318,32 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		Paint.FontMetrics metrics = mPaint.getFontMetrics();
 		mTextMaxHeight = (int) (metrics.bottom - metrics.top);
 
-		if (mItemIconEnabled) {
-			mItemIconSize = mTextMaxHeight;
-		}
+		updateContentPositions();
+	}
+
+	private void updateContentPositions() {
+		int contentWidth = mTextMaxWidth + mItemIconPadding + mItemIconSize;
+
+		rectContent.set(
+				mRectDrawn.centerX() - contentWidth / 2,
+				mRectDrawn.top,
+				mRectDrawn.centerX() + contentWidth / 2,
+				mRectDrawn.bottom
+		);
+
+		rectIcon.set(
+				rectContent.left,
+				rectContent.top,
+				rectContent.left + mItemIconSize,
+				rectContent.bottom
+		);
+
+		rectText.set(
+				rectContent.right - mTextMaxWidth,
+				rectContent.top,
+				rectContent.right,
+				rectContent.bottom
+		);
 	}
 
 	private void updateItemTextAlign() {
@@ -342,12 +373,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 		// 计算原始内容尺寸
 		// Correct sizes of original content
-		int resultWidth = mTextMaxWidth;
+		int resultWidth = mTextMaxWidth + mItemIconSize;
 		int resultHeight = mTextMaxHeight * mVisibleItemCount + mItemSpace * (mVisibleItemCount - 1);
 
-		if (mItemIconEnabled) {
-			resultWidth += mItemIconSize;
-		}
 		if (isDebug) {
 			Log.i(TAG, "Wheel's content size is (" + resultWidth + ":" + resultHeight + ")");
 		}
@@ -412,6 +440,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		// 计算当前选中的数据项区域
 		// Correct region of current select item
 		computeCurrentItemRect();
+
+		updateContentPositions();
 	}
 
 	private void computeDrawnCenter() {
@@ -445,9 +475,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-//		if (null != mOnWheelChangeListener) {
-//			mOnWheelChangeListener.onWheelScrolled(mScrollOffsetY);
-//		}
 		int drawnDataStartPos = -mScrollOffsetY / mItemHeight - mHalfDrawnItemCount;
 		for (int drawnDataPos = drawnDataStartPos + mSelectedItemPosition,
 			 drawnOffsetPos = -mHalfDrawnItemCount;
@@ -489,42 +516,30 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				canvas.clipRect(mRectCurrentItem, Region.Op.DIFFERENCE);
 
 				if (icon != null) {
-					canvas.drawBitmap(icon, iconLeft, iconTop, mPaint);
+					canvas.drawBitmap(icon, rectIcon.left, iconTop, mPaint);
 				}
 
-				if (mItemIconEnabled) {
-					canvas.translate(mItemIconSize, 0);
-				}
-
-				canvas.drawText(data, mDrawnCenterX, mDrawnItemCenterY, mPaint);
+				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, mPaint);
 				canvas.restore();
 
 				canvas.save();
 				canvas.clipRect(mRectCurrentItem);
 
 				if (icon != null) {
-					canvas.drawBitmap(icon, iconLeft, iconTop, mSelectedPaint);
+					canvas.drawBitmap(icon, rectIcon.left, iconTop, mSelectedPaint);
 				}
 
-				if (mItemIconEnabled) {
-					canvas.translate(mItemIconSize, 0);
-				}
-
-				canvas.drawText(data, mDrawnCenterX, mDrawnItemCenterY, mSelectedPaint);
+				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, mSelectedPaint);
 				canvas.restore();
 			} else {
 				canvas.save();
 				canvas.clipRect(mRectDrawn);
 
 				if (icon != null) {
-					canvas.drawBitmap(icon, iconLeft, iconTop, mPaint);
+					canvas.drawBitmap(icon, rectIcon.left, iconTop, mPaint);
 				}
 
-				if (mItemIconEnabled) {
-					canvas.translate(mItemIconSize, 0);
-				}
-
-				canvas.drawText(data, mDrawnCenterX, mDrawnItemCenterY, mPaint);
+				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, mPaint);
 				canvas.restore();
 			}
 

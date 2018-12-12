@@ -1,5 +1,11 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <option name="OTHER_INDENT_OPTIONS">
+      <value>
+        <option name="SMART_TABS" value="true" />
+      </value>
+    </option>
+    <option name="LINE_SEPARATOR" value="&#10;" />
     <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
     <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
     <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
@@ -7,9 +13,11 @@
     </option>
     <option name="IMPORT_LAYOUT_TABLE">
       <value>
+        <package name="com.mercdev" withSubpackages="true" static="false" />
+        <emptyLine />
         <package name="android" withSubpackages="true" static="false" />
         <emptyLine />
-        <package name="com" withSubpackages="true" static="false" />
+        <package name="java" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="junit" withSubpackages="true" static="false" />
         <emptyLine />
@@ -17,7 +25,7 @@
         <emptyLine />
         <package name="org" withSubpackages="true" static="false" />
         <emptyLine />
-        <package name="java" withSubpackages="true" static="false" />
+        <package name="com" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="javax" withSubpackages="true" static="false" />
         <emptyLine />
@@ -27,11 +35,36 @@
         <emptyLine />
       </value>
     </option>
-    <option name="RIGHT_MARGIN" value="100" />
+    <option name="RIGHT_MARGIN" value="240" />
+    <option name="JD_ADD_BLANK_AFTER_PARM_COMMENTS" value="true" />
+    <option name="JD_ADD_BLANK_AFTER_RETURN" value="true" />
+    <option name="JD_PARAM_DESCRIPTION_ON_NEW_LINE" value="true" />
     <AndroidXmlCodeStyleSettings>
       <option name="USE_CUSTOM_SETTINGS" value="true" />
     </AndroidXmlCodeStyleSettings>
+    <GroovyCodeStyleSettings>
+      <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="1000000" />
+      <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="1000000" />
+      <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
+        <value />
+      </option>
+      <option name="IMPORT_LAYOUT_TABLE">
+        <value>
+          <package name="com.mercdev.eventicious" withSubpackages="true" static="false" />
+          <package name="com.eventicious" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="javax" withSubpackages="true" static="false" />
+          <package name="java" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="" withSubpackages="true" static="true" />
+        </value>
+      </option>
+    </GroovyCodeStyleSettings>
     <JavaCodeStyleSettings>
+      <option name="SPACE_AFTER_CLOSING_ANGLE_BRACKET_IN_TYPE_ARGUMENT" value="true" />
+      <option name="CLASS_NAMES_IN_JAVADOC" value="3" />
       <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
       <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
       <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
@@ -39,9 +72,11 @@
       </option>
       <option name="IMPORT_LAYOUT_TABLE">
         <value>
+          <package name="com.mercdev" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="android" withSubpackages="true" static="false" />
           <emptyLine />
-          <package name="com" withSubpackages="true" static="false" />
+          <package name="java" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="junit" withSubpackages="true" static="false" />
           <emptyLine />
@@ -49,7 +84,7 @@
           <emptyLine />
           <package name="org" withSubpackages="true" static="false" />
           <emptyLine />
-          <package name="java" withSubpackages="true" static="false" />
+          <package name="com" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="javax" withSubpackages="true" static="false" />
           <emptyLine />
@@ -59,7 +94,17 @@
           <emptyLine />
         </value>
       </option>
+      <option name="JD_ADD_BLANK_AFTER_PARM_COMMENTS" value="true" />
+      <option name="JD_ADD_BLANK_AFTER_RETURN" value="true" />
+      <option name="JD_PARAM_DESCRIPTION_ON_NEW_LINE" value="true" />
     </JavaCodeStyleSettings>
+    <JetCodeStyleSettings>
+      <option name="PACKAGES_TO_USE_STAR_IMPORTS">
+        <value />
+      </option>
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="2147483647" />
+    </JetCodeStyleSettings>
     <Objective-C-extensions>
       <file>
         <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
@@ -86,15 +131,52 @@
       </extensions>
     </Objective-C-extensions>
     <XML>
-      <option name="XML_KEEP_LINE_BREAKS" value="false" />
+      <option name="XML_ATTRIBUTE_WRAP" value="2" />
       <option name="XML_ALIGN_ATTRIBUTES" value="false" />
       <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
       <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
     </XML>
-    <codeStyleSettings language="XML">
-      <option name="FORCE_REARRANGE_MODE" value="1" />
+    <codeStyleSettings language="Groovy">
+      <indentOptions>
+        <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="SMART_TABS" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="HTML">
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="SMART_TABS" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="JAVA">
+      <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
+      <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
+      <option name="IF_BRACE_FORCE" value="3" />
+      <option name="DOWHILE_BRACE_FORCE" value="3" />
+      <option name="WHILE_BRACE_FORCE" value="3" />
+      <option name="FOR_BRACE_FORCE" value="3" />
+      <option name="VARIABLE_ANNOTATION_WRAP" value="2" />
+      <indentOptions>
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="JSON">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="ObjectiveC">
+      <indentOptions>
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="XML">
+      <indentOptions>
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="SMART_TABS" value="true" />
       </indentOptions>
       <arrangement>
         <rules>
@@ -103,7 +185,7 @@
               <match>
                 <AND>
                   <NAME>xmlns:android</NAME>
-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+                  <XML_NAMESPACE>Namespace:</XML_NAMESPACE>
                 </AND>
               </match>
             </rule>
@@ -113,7 +195,7 @@
               <match>
                 <AND>
                   <NAME>xmlns:.*</NAME>
-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+                  <XML_NAMESPACE>Namespace:</XML_NAMESPACE>
                 </AND>
               </match>
               <order>BY_NAME</order>
@@ -247,6 +329,14 @@
           </section>
         </rules>
       </arrangement>
+    </codeStyleSettings>
+    <codeStyleSettings language="kotlin">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
+        <option name="SMART_TABS" value="true" />
+      </indentOptions>
     </codeStyleSettings>
   </code_scheme>
 </component>
