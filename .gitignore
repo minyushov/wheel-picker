@@ -8,3 +8,4 @@
 /publish.gradle
 *.iml
 .idea/caches
+.idea/modules.xml
