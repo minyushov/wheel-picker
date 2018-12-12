@@ -20,33 +20,14 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
-/**
- * 滚轮选择器
- * <p>
- * WheelPicker
- *
- * @author AigeStudio 2015-12-12
- * @author AigeStudio 2016-06-17
- * 更新项目结构
- * <p>
- * New project structure
- * @version 1.1.0
- */
 public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable {
-	/**
-	 * 滚动状态标识值
-	 *
-	 * @see OnWheelChangeListener#onWheelScrollStateChanged(int)
-	 */
-	public static final int SCROLL_STATE_IDLE = 0, SCROLL_STATE_DRAGGING = 1,
-			SCROLL_STATE_SCROLLING = 2;
+	public static final int SCROLL_STATE_IDLE = 0;
+	public static final int SCROLL_STATE_DRAGGING = 1;
+	public static final int SCROLL_STATE_SCROLLING = 2;
 
-	/**
-	 * 数据项对齐方式标识值
-	 *
-	 * @see #setItemAlign(int)
-	 */
-	public static final int ALIGN_CENTER = 0, ALIGN_LEFT = 1, ALIGN_RIGHT = 2;
+	public static final int ALIGN_CENTER = 0;
+	public static final int ALIGN_LEFT = 1;
+	public static final int ALIGN_RIGHT = 2;
 
 	private static final int QUICK_SCROLL_VELOCITY = 10000;
 	private static final int TOUCH_SLOP = 4;
@@ -59,6 +40,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	private Paint mSelectedPaint;
 	private Scroller mScroller;
 	private VelocityTracker mTracker;
+
 	/**
 	 * Determines whether the current scrolling animation is triggered by touchEvent or setSelectedItemPosition.
 	 * User added eventListeners will only be fired after touchEvents.
@@ -76,51 +58,19 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 	private WheelAdapter mAdapter;
 
-	/**
-	 * 最宽的文本
-	 *
-	 * @see #setMaximumWidthText(String)
-	 */
 	private String mMaxWidthText;
 
-	/**
-	 * 滚轮选择器中可见的数据项数量和滚轮选择器将会绘制的数据项数量
-	 *
-	 * @see #setVisibleItemCount(int)
-	 */
 	private int mVisibleItemCount, mDrawnItemCount;
 
-	/**
-	 * 滚轮选择器将会绘制的Item数量的一半
-	 */
 	private int mHalfDrawnItemCount;
 
-	/**
-	 * 单个文本最大宽高
-	 */
 	private int mTextMaxWidth, mTextMaxHeight;
 
-	/**
-	 * 数据项文本颜色以及被选中的数据项文本颜色
-	 *
-	 * @see #setItemTextColor(int)
-	 * @see #setSelectedItemTextColor(int)
-	 */
 	private int mItemTextColor, mSelectedItemTextColor;
 	private boolean mSelectedItemTextColorEnabled;
 
-	/**
-	 * 数据项文本尺寸
-	 *
-	 * @see #setItemTextSize(int)
-	 */
 	private int mItemTextSize;
 
-	/**
-	 * 数据项之间间距
-	 *
-	 * @see #setItemSpace(int)
-	 */
 	private int mItemSpace;
 
 	private boolean mItemIconEnabled;
@@ -128,94 +78,36 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 	private final int mItemIconSize;
 	private final int mItemIconPadding;
 
-	/**
-	 * 数据项对齐方式
-	 *
-	 * @see #setItemAlign(int)
-	 */
 	private int mItemAlign;
 
-	/**
-	 * 滚轮选择器单个数据项高度以及单个数据项一半的高度
-	 */
 	private int mItemHeight, mHalfItemHeight;
 
-	/**
-	 * 当前被选中的数据项所显示的数据在数据源中的位置
-	 *
-	 * @see #setSelectedItemPosition(int)
-	 */
 	private int mSelectedItemPosition;
 
-	/**
-	 * 当前被选中的数据项所显示的数据在数据源中的位置
-	 *
-	 * @see #getCurrentItemPosition()
-	 */
 	private int mCurrentItemPosition;
 
-	/**
-	 * 滚轮滑动时可以滑动到的最小/最大的Y坐标
-	 */
 	private int mMinFlingY, mMaxFlingY;
 
-	/**
-	 * 滚轮滑动时的最小/最大速度
-	 */
 	private int mMinimumVelocity = 50, mMaximumVelocity = 8000;
 
-	/**
-	 * 滚轮选择器中心坐标
-	 */
 	private int mWheelCenterX, mWheelCenterY;
 
-	/**
-	 * 滚轮选择器绘制中心坐标
-	 */
 	private int mDrawnCenterX, mDrawnCenterY;
 
-	/**
-	 * 滚轮选择器视图区域在Y轴方向上的偏移值
-	 */
 	private int mScrollOffsetY;
 
-	/**
-	 * 滚轮选择器中最宽或最高的文本在数据源中的位置
-	 */
 	private int mTextMaxWidthPosition;
 
-	/**
-	 * 用户手指上一次触摸事件发生时事件Y坐标
-	 */
 	private int mLastPointY;
 
-	/**
-	 * 手指触摸屏幕时事件点的Y坐标
-	 */
 	private int mDownPointY;
 
-	/**
-	 * 滚轮选择器的每一个数据项文本是否拥有相同的宽度
-	 *
-	 * @see #setSameWidth(boolean)
-	 */
 	private boolean hasSameWidth;
 
-	/**
-	 * 是否显示空气感效果
-	 *
-	 * @see #setAtmospheric(boolean)
-	 */
 	private boolean hasAtmospheric;
 
-	/**
-	 * 是否为点击模式
-	 */
 	private boolean isClick;
 
-	/**
-	 * 是否为强制结束滑动
-	 */
 	private boolean isForceFinishScroll;
 	private boolean isDebug;
 
@@ -227,18 +119,14 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		super(context, attrs);
 
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker);
-		mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size,
-				getResources().getDimensionPixelSize(R.dimen.default_text_size));
-		mItemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_height,
-				getResources().getDimensionPixelSize(R.dimen.default_item_height));
+		mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size, getResources().getDimensionPixelSize(R.dimen.default_text_size));
+		mItemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_height, getResources().getDimensionPixelSize(R.dimen.default_item_height));
 		mSelectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
 		hasSameWidth = a.getBoolean(R.styleable.WheelPicker_wheel_same_width, false);
-		mTextMaxWidthPosition =
-				a.getInt(R.styleable.WheelPicker_wheel_maximum_width_text_position, -1);
+		mTextMaxWidthPosition = a.getInt(R.styleable.WheelPicker_wheel_maximum_width_text_position, -1);
 		mMaxWidthText = a.getString(R.styleable.WheelPicker_wheel_maximum_width_text);
 		mSelectedItemTextColorEnabled = a.hasValue(R.styleable.WheelPicker_wheel_selected_item_text_color);
-		mSelectedItemTextColor = a.getColor
-				(R.styleable.WheelPicker_wheel_selected_item_text_color, -1);
+		mSelectedItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_selected_item_text_color, -1);
 		mItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_item_text_color, 0xFF888888);
 		mItemSpace = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_space, 0);
 		mItemIconEnabled = a.getBoolean(R.styleable.WheelPicker_wheel_item_icon_enabled, false);
@@ -259,11 +147,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		mSelectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
 		mSelectedPaint.setTextSize(mItemTextSize);
 
-		// 更新文本对齐方式
 		// Update alignment of text
 		updateItemTextAlign();
 
-		// 计算文本尺寸
 		// Correct sizes of text
 		computeTextSize();
 
@@ -287,7 +173,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 			throw new ArithmeticException("Wheel's visible item count can not be less than 2!");
 		}
 
-		// 确保滚轮选择器可见数据项数量为奇数
 		// Be sure count of visible item is odd number
 		if (mVisibleItemCount % 2 == 0) {
 			mVisibleItemCount += 1;
@@ -371,7 +256,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
 
-		// 计算原始内容尺寸
 		// Correct sizes of original content
 		int resultWidth = mTextMaxWidth + mItemIconSize;
 		int resultHeight = mTextMaxHeight * mVisibleItemCount + mItemSpace * (mVisibleItemCount - 1);
@@ -380,7 +264,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 			Log.i(TAG, "Wheel's content size is (" + resultWidth + ":" + resultHeight + ")");
 		}
 
-		// 考虑内边距对尺寸的影响
 		// Consideration padding influence the view sizes
 		resultWidth += getPaddingLeft() + getPaddingRight();
 		resultHeight += getPaddingTop() + getPaddingBottom();
@@ -388,7 +271,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 			Log.i(TAG, "Wheel's size is (" + resultWidth + ":" + resultHeight + ")");
 		}
 
-		// 考虑父容器对尺寸的影响
 		// Consideration sizes of parent can influence the view sizes
 		resultWidth = measureSize(modeWidth, sizeWidth, resultWidth);
 		resultHeight = measureSize(modeHeight, sizeHeight, resultHeight);
@@ -411,7 +293,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldW, int oldH) {
-		// 设置内容区域
 		// Set content region
 		mRectDrawn.set(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(),
 				getHeight() - getPaddingBottom());
@@ -421,23 +302,19 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 					mRectDrawn.top + ")");
 		}
 
-		// 获取内容区域中心坐标
 		// Get the center coordinates of content region
 		mWheelCenterX = mRectDrawn.centerX();
 		mWheelCenterY = mRectDrawn.centerY();
 
-		// 计算数据项绘制中心
 		// Correct item drawn center
 		computeDrawnCenter();
 
 		mVisibleItemCount = mRectDrawn.height() / mItemHeight;
 		updateVisibleItemCount();
 
-		// 初始化滑动最大坐标
 		// Initialize fling max Y-coordinates
 		computeFlingLimitY();
 
-		// 计算当前选中的数据项区域
 		// Correct region of current select item
 		computeCurrentItemRect();
 
@@ -501,15 +378,12 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 				mPaint.setAlpha(alpha);
 			}
 
-			int iconLeft = 0;
 			int iconTop = 0;
 
 			if (icon != null) {
-				iconLeft = mDrawnCenterX - icon.getWidth() * 2;
 				iconTop = mWheelCenterY + (drawnOffsetPos * mItemHeight) + mScrollOffsetY % mItemHeight - icon.getHeight() / 2;
 			}
 
-			// 判断是否需要为当前数据项绘制不同颜色
 			// Judges need to draw different color for current item or not
 			if (mSelectedItemTextColorEnabled) {
 				canvas.save();
@@ -603,7 +477,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 					mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_DRAGGING);
 				}
 
-				// 滚动内容
 				// Scroll WheelPicker's content
 				float move = event.getY() - mLastPointY;
 				if (Math.abs(move) < 1) {
@@ -625,7 +498,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
 				mTracker.computeCurrentVelocity(1000, mMaximumVelocity);
 
-				// 根据速度判断是该滚动还是滑动
 				// Judges the WheelPicker is scroll or fling base on current velocity
 				isForceFinishScroll = false;
 				int velocity = (int) mTracker.getYVelocity();
@@ -652,7 +524,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 							computeDistanceToEndPoint(mScrollOffsetY % mItemHeight));
 				}
 
-				// 校正坐标
 				// Correct coordinates
 				if (mScroller.getFinalY() > mMaxFlingY) {
 					mScroller.setFinalY(mMaxFlingY);
@@ -787,7 +658,6 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		}
 		mAdapter = adapter;
 
-		// 重置位置
 		if (mSelectedItemPosition > mAdapter.getSize() - 1 || mCurrentItemPosition > mAdapter.getSize() - 1) {
 			mSelectedItemPosition = mCurrentItemPosition = mAdapter.getSize() - 1;
 		} else {
@@ -945,65 +815,34 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 		invalidate();
 	}
 
-	/**
-	 * 滚轮选择器滚动时监听接口
-	 *
-	 * @author AigeStudio 2016-06-17
-	 * 新项目结构
-	 * <p>
-	 * New project structure
-	 * @since 2016-06-17
-	 */
 	public interface OnWheelChangeListener {
 		/**
-		 * 当滚轮选择器滚动时回调该方法
-		 * 滚轮选择器滚动时会将当前滚动位置与滚轮初始位置之间的偏移距离返回，该偏移距离有正负之分，正值表示
-		 * 滚轮正在往上滚动，负值则表示滚轮正在往下滚动
-		 * <p>
 		 * Invoke when WheelPicker scroll stopped
 		 * WheelPicker will return a distance offset which between current scroll position and
 		 * initial position, this offset is a positive or a negative, positive means WheelPicker is
 		 * scrolling from bottom to top, negative means WheelPicker is scrolling from top to bottom
 		 *
 		 * @param offset
-		 * 		当前滚轮滚动距离上一次滚轮滚动停止后偏移的距离
-		 * 		<p>
 		 * 		Distance offset which between current scroll position and initial position
 		 */
 		void onWheelScrolled(int offset);
 
 		/**
-		 * 当滚轮选择器停止后回调该方法
-		 * 滚轮选择器停止后会回调该方法并将当前选中的数据项在数据列表中的位置返回
-		 * <p>
 		 * Invoke when WheelPicker scroll stopped
 		 * This method will be called when WheelPicker stop and return current selected item data's
 		 * position in list
 		 *
 		 * @param position
-		 * 		当前选中的数据项在数据列表中的位置
-		 * 		<p>
 		 * 		Current selected item data's position in list
 		 */
 		void onWheelSelected(int position);
 
 		/**
-		 * 当滚轮选择器滚动状态改变时回调该方法
-		 * 滚动选择器的状态总是会在静止、拖动和滑动三者之间切换，当状态改变时回调该方法
-		 * <p>
 		 * Invoke when WheelPicker's scroll state changed
 		 * The state of WheelPicker always between idle, dragging, and scrolling, this method will
 		 * be called when they switch
 		 *
 		 * @param state
-		 * 		滚轮选择器滚动状态，其值仅可能为下列之一
-		 * 		{@link WheelPicker#SCROLL_STATE_IDLE}
-		 * 		表示滚动选择器处于静止状态
-		 * 		{@link WheelPicker#SCROLL_STATE_DRAGGING}
-		 * 		表示滚动选择器处于拖动状态
-		 * 		{@link WheelPicker#SCROLL_STATE_SCROLLING}
-		 * 		表示滚动选择器处于滑动状态
-		 * 		<p>
 		 * 		State of WheelPicker, only one of the following
 		 * 		{@link WheelPicker#SCROLL_STATE_IDLE}
 		 * 		Express WheelPicker in state of idle

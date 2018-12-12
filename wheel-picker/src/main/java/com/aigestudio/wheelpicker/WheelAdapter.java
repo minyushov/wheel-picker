@@ -14,7 +14,6 @@ public final class WheelAdapter<T> {
 
 	/**
 	 * Apply new {@code data} to {@link WheelPicker} and select first item without animation
-	 *
 	 */
 	public void setData(List<WheelItem<T>> data) {
 		setData(data, 0);
@@ -22,7 +21,6 @@ public final class WheelAdapter<T> {
 
 	/**
 	 * Apply new {@code data} to {@link WheelPicker} and select item with this {@code position} without animation
-	 *
 	 */
 	public void setData(List<WheelItem<T>> data, int selectedItemPosition) {
 		setData(data, selectedItemPosition, false);
@@ -30,7 +28,6 @@ public final class WheelAdapter<T> {
 
 	/**
 	 * Apply new {@code data} to {@link WheelPicker} and select item with this {@code position} with animation if animated == true
-	 *
 	 */
 	public void setData(List<WheelItem<T>> data, int selectedItemPosition, boolean animated) {
 		this.data = data;
