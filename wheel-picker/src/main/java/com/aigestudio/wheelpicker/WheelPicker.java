@@ -1,9 +1,11 @@
 package com.aigestudio.wheelpicker;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -14,6 +16,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -21,6 +24,9 @@ import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
 public class WheelPicker extends View implements Runnable {
+	private static final String TAG = "WheelPicker";
+	private static final boolean DEBUG = false;
+
 	public static final int SCROLL_STATE_IDLE = 0;
 	public static final int SCROLL_STATE_DRAGGING = 1;
 	public static final int SCROLL_STATE_SCROLLING = 2;
@@ -28,14 +34,13 @@ public class WheelPicker extends View implements Runnable {
 	private static final int QUICK_SCROLL_VELOCITY = 10000;
 	private static final int TOUCH_SLOP = 4;
 
-	private static final String TAG = WheelPicker.class.getSimpleName();
+	private final Handler handler = new Handler();
 
-	private final Handler mHandler = new Handler();
+	private final Paint textPaint;
+	private final Paint selectedTextPaint;
 
-	private Paint mPaint;
-	private Paint mSelectedPaint;
-	private Scroller mScroller;
-	private VelocityTracker mTracker;
+	private final Scroller scroller;
+	private VelocityTracker tracker;
 
 	/**
 	 * Determines whether the current scrolling animation is triggered by touchEvent or setSelectedItemPosition.
@@ -43,67 +48,57 @@ public class WheelPicker extends View implements Runnable {
 	 */
 	private boolean isTouchTriggered;
 
-	private OnWheelChangeListener mOnWheelChangeListener;
+	private OnWheelChangeListener onWheelChangeListener;
 
-	private final Rect mRectDrawn = new Rect();
-	private final Rect mRectCurrentItem = new Rect();
+	private final Rect rectItem = new Rect();
+	private final Rect rectCurrentItem = new Rect();
 
 	private final Rect rectContent = new Rect();
 	private final Rect rectIcon = new Rect();
 	private final Rect rectText = new Rect();
 
-	private WheelAdapter mAdapter;
+	private WheelAdapter<?> adapter;
 
-	private String mMaxWidthText;
+	private String maxWidthText;
 
-	private int mVisibleItemCount, mDrawnItemCount;
+	private int visibleItemCount;
+	private int drawnItemCount;
 
-	private int mHalfDrawnItemCount;
+	private int textMaxWidth;
+	private int textMaxHeight;
 
-	private int mTextMaxWidth, mTextMaxHeight;
+	private final int textColor;
+	private final int textColorSelected;
 
-	private int mItemTextColor, mSelectedItemTextColor;
-	private boolean mSelectedItemTextColorEnabled;
+	private final int drawableSize;
+	private final int drawablePadding;
 
-	private int mItemTextSize;
+	private final int itemHeight;
 
-	private int mItemSpace;
+	private int selectedItemPosition;
+	private int currentItemPosition;
 
-	private boolean mItemIconEnabled;
+	private int minFlingY;
+	private int maxFlingY;
 
-	private final int mItemIconSize;
-	private final int mItemIconPadding;
+	private int minimumVelocity;
+	private int maximumVelocity;
 
-	private int mItemHeight, mHalfItemHeight;
+	private int wheelCenterY;
+	private int drawnCenterY;
 
-	private int mSelectedItemPosition;
+	private int scrollOffsetY;
 
-	private int mCurrentItemPosition;
+	private int textMaxWidthPosition;
 
-	private int mMinFlingY, mMaxFlingY;
-
-	private int mMinimumVelocity = 50, mMaximumVelocity = 8000;
-
-	private int mWheelCenterX, mWheelCenterY;
-
-	private int mDrawnCenterX, mDrawnCenterY;
-
-	private int mScrollOffsetY;
-
-	private int mTextMaxWidthPosition;
-
-	private int mLastPointY;
-
-	private int mDownPointY;
+	private int lastPointY;
+	private int downPointY;
 
 	private boolean hasSameWidth;
-
 	private boolean hasAtmospheric;
 
 	private boolean isClick;
-
 	private boolean isForceFinishScroll;
-	private boolean isDebug;
 
 	public WheelPicker(Context context) {
 		this(context, null);
@@ -112,111 +107,105 @@ public class WheelPicker extends View implements Runnable {
 	public WheelPicker(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker);
-		mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size, getResources().getDimensionPixelSize(R.dimen.default_text_size));
-		mItemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_height, getResources().getDimensionPixelSize(R.dimen.default_item_height));
-		mSelectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
-		hasSameWidth = a.getBoolean(R.styleable.WheelPicker_wheel_same_width, false);
-		mTextMaxWidthPosition = a.getInt(R.styleable.WheelPicker_wheel_maximum_width_text_position, -1);
-		mMaxWidthText = a.getString(R.styleable.WheelPicker_wheel_maximum_width_text);
-		mSelectedItemTextColorEnabled = a.hasValue(R.styleable.WheelPicker_wheel_selected_item_text_color);
-		mSelectedItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_selected_item_text_color, -1);
-		mItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_item_text_color, 0xFF888888);
-		mItemSpace = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_space, 0);
-		mItemIconEnabled = a.getBoolean(R.styleable.WheelPicker_wheel_item_icon_enabled, false);
-		if (mItemIconEnabled) {
-			mItemIconSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_icon_size, 0);
-			mItemIconPadding = a.getDimensionPixelOffset(R.styleable.WheelPicker_wheel_item_icon_padding, 0);
-		} else {
-			mItemIconSize = 0;
-			mItemIconPadding = 0;
+		TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker);
+
+		ColorStateList colorStateList = typedArray.getColorStateList(R.styleable.WheelPicker_android_textColor);
+		if (colorStateList == null) {
+			colorStateList = ColorStateList.valueOf(Color.BLACK);
 		}
-		hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
-		a.recycle();
+		this.textColor = colorStateList.getColorForState(View.EMPTY_STATE_SET, Color.BLACK);
+		this.textColorSelected = colorStateList.getColorForState(View.SELECTED_STATE_SET, Color.BLACK);
 
-		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
-		mPaint.setTextSize(mItemTextSize);
-		mPaint.setTextAlign(Paint.Align.CENTER);
+		int textSize = typedArray.getDimensionPixelSize(R.styleable.WheelPicker_android_textSize, spToPx(12));
 
-		mSelectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
-		mSelectedPaint.setTextSize(mItemTextSize);
-		mSelectedPaint.setTextAlign(Paint.Align.CENTER);
+		itemHeight = typedArray.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_height, dpToPx(50));
+		selectedItemPosition = typedArray.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
+		hasSameWidth = typedArray.getBoolean(R.styleable.WheelPicker_wheel_same_width, false);
+		textMaxWidthPosition = typedArray.getInt(R.styleable.WheelPicker_wheel_maximum_width_text_position, -1);
+		maxWidthText = typedArray.getString(R.styleable.WheelPicker_wheel_maximum_width_text);
+		drawableSize = typedArray.getDimensionPixelSize(R.styleable.WheelPicker_wheel_drawableSize, 0);
+		drawablePadding = typedArray.getDimensionPixelOffset(R.styleable.WheelPicker_android_drawablePadding, 0);
+		hasAtmospheric = typedArray.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
+		typedArray.recycle();
+
+		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
+		textPaint.setTextSize(textSize);
+		textPaint.setTextAlign(Paint.Align.CENTER);
+		textPaint.setColorFilter(new PorterDuffColorFilter(textColor, PorterDuff.Mode.SRC_IN));
+		textPaint.setStyle(Paint.Style.FILL);
+
+		selectedTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
+		selectedTextPaint.setTextSize(textSize);
+		selectedTextPaint.setTextAlign(Paint.Align.CENTER);
+		selectedTextPaint.setColorFilter(new PorterDuffColorFilter(textColorSelected, PorterDuff.Mode.SRC_IN));
+		selectedTextPaint.setStyle(Paint.Style.FILL);
 
 		// Correct sizes of text
 		computeTextSize();
 
-		mHalfItemHeight = mItemHeight / 2;
-
-		mScroller = new Scroller(getContext());
+		scroller = new Scroller(getContext());
 
 		ViewConfiguration conf = ViewConfiguration.get(getContext());
-		mMinimumVelocity = conf.getScaledMinimumFlingVelocity();
-		mMaximumVelocity = conf.getScaledMaximumFlingVelocity();
-
-		mPaint.setColorFilter(new PorterDuffColorFilter(mItemTextColor, PorterDuff.Mode.SRC_IN));
-		mPaint.setStyle(Paint.Style.FILL);
-
-		mSelectedPaint.setColorFilter(new PorterDuffColorFilter(mSelectedItemTextColor, PorterDuff.Mode.SRC_IN));
-		mSelectedPaint.setStyle(Paint.Style.FILL);
+		minimumVelocity = conf.getScaledMinimumFlingVelocity();
+		maximumVelocity = conf.getScaledMaximumFlingVelocity();
 	}
 
 	private void updateVisibleItemCount() {
-		if (mVisibleItemCount < 2) {
+		if (visibleItemCount < 2) {
 			throw new ArithmeticException("Wheel's visible item count can not be less than 2!");
 		}
 
 		// Be sure count of visible item is odd number
-		if (mVisibleItemCount % 2 == 0) {
-			mVisibleItemCount += 1;
+		if (visibleItemCount % 2 == 0) {
+			visibleItemCount += 1;
 		}
-		mDrawnItemCount = mVisibleItemCount + 2;
-		mHalfDrawnItemCount = mDrawnItemCount / 2;
+		drawnItemCount = visibleItemCount + 2;
 	}
 
 	private void computeTextSize() {
-		mTextMaxWidth = mTextMaxHeight = 0;
-		if (mAdapter != null && mAdapter.getSize() != 0) {
+		textMaxWidth = textMaxHeight = 0;
+		if (adapter != null && adapter.getSize() != 0) {
 			if (hasSameWidth) {
-				mTextMaxWidth = (int) mPaint.measureText(String.valueOf(mAdapter.getData().get(0)));
-			} else if (isPosInRang(mTextMaxWidthPosition)) {
-				mTextMaxWidth = (int) mPaint.measureText
-						(String.valueOf(mAdapter.getData().get(mTextMaxWidthPosition)));
-			} else if (!TextUtils.isEmpty(mMaxWidthText)) {
-				mTextMaxWidth = (int) mPaint.measureText(mMaxWidthText);
+				textMaxWidth = (int) textPaint.measureText(String.valueOf(adapter.getData().get(0)));
+			} else if (isPosInRange(textMaxWidthPosition)) {
+				textMaxWidth = (int) textPaint.measureText
+						(String.valueOf(adapter.getData().get(textMaxWidthPosition)));
+			} else if (!TextUtils.isEmpty(maxWidthText)) {
+				textMaxWidth = (int) textPaint.measureText(maxWidthText);
 			} else {
-				for (Object obj : mAdapter.getData()) {
+				for (Object obj : adapter.getData()) {
 					String text = String.valueOf(obj);
-					int width = (int) mPaint.measureText(text);
-					mTextMaxWidth = Math.max(mTextMaxWidth, width);
+					int width = (int) textPaint.measureText(text);
+					textMaxWidth = Math.max(textMaxWidth, width);
 				}
 			}
 		}
 
-		Paint.FontMetrics metrics = mPaint.getFontMetrics();
-		mTextMaxHeight = (int) (metrics.bottom - metrics.top);
+		Paint.FontMetrics metrics = textPaint.getFontMetrics();
+		textMaxHeight = (int) (metrics.bottom - metrics.top);
 
 		updateContentPositions();
 	}
 
 	private void updateContentPositions() {
-		int contentWidth = mTextMaxWidth + mItemIconPadding + mItemIconSize;
+		int contentWidth = textMaxWidth + drawablePadding + drawableSize;
 
 		rectContent.set(
-				mRectDrawn.centerX() - contentWidth / 2,
-				mRectDrawn.top,
-				mRectDrawn.centerX() + contentWidth / 2,
-				mRectDrawn.bottom
+				rectItem.centerX() - contentWidth / 2,
+				rectItem.top,
+				rectItem.centerX() + contentWidth / 2,
+				rectItem.bottom
 		);
 
 		rectIcon.set(
 				rectContent.left,
 				rectContent.top,
-				rectContent.left + mItemIconSize,
+				rectContent.left + drawableSize,
 				rectContent.bottom
 		);
 
 		rectText.set(
-				rectContent.right - mTextMaxWidth,
+				rectContent.right - textMaxWidth,
 				rectContent.top,
 				rectContent.right,
 				rectContent.bottom
@@ -232,17 +221,18 @@ public class WheelPicker extends View implements Runnable {
 		int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
 
 		// Correct sizes of original content
-		int resultWidth = mTextMaxWidth + mItemIconSize;
-		int resultHeight = mTextMaxHeight * mVisibleItemCount + mItemSpace * (mVisibleItemCount - 1);
+		int resultWidth = textMaxWidth + drawableSize;
+		int resultHeight = textMaxHeight * visibleItemCount;
 
-		if (isDebug) {
+		if (DEBUG) {
 			Log.i(TAG, "Wheel's content size is (" + resultWidth + ":" + resultHeight + ")");
 		}
 
 		// Consideration padding influence the view sizes
 		resultWidth += getPaddingLeft() + getPaddingRight();
 		resultHeight += getPaddingTop() + getPaddingBottom();
-		if (isDebug) {
+
+		if (DEBUG) {
 			Log.i(TAG, "Wheel's size is (" + resultWidth + ":" + resultHeight + ")");
 		}
 
@@ -269,22 +259,24 @@ public class WheelPicker extends View implements Runnable {
 	@Override
 	protected void onSizeChanged(int w, int h, int oldW, int oldH) {
 		// Set content region
-		mRectDrawn.set(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(),
-				getHeight() - getPaddingBottom());
-		if (isDebug) {
-			Log.i(TAG, "Wheel's drawn rect size is (" + mRectDrawn.width() + ":" +
-					mRectDrawn.height() + ") and location is (" + mRectDrawn.left + ":" +
-					mRectDrawn.top + ")");
+		rectItem.set(
+				getPaddingLeft(),
+				getPaddingTop(),
+				getWidth() - getPaddingRight(),
+				getHeight() - getPaddingBottom()
+		);
+
+		if (DEBUG) {
+			Log.i(TAG, "Wheel's drawn rect size is (" + rectItem.width() + ":" + rectItem.height() + ") and location is (" + rectItem.left + ":" + rectItem.top + ")");
 		}
 
 		// Get the center coordinates of content region
-		mWheelCenterX = mRectDrawn.centerX();
-		mWheelCenterY = mRectDrawn.centerY();
+		wheelCenterY = rectItem.centerY();
 
 		// Correct item drawn center
-		computeDrawnCenter();
+		drawnCenterY = (int) (wheelCenterY - ((textPaint.ascent() + textPaint.descent()) / 2));
 
-		mVisibleItemCount = mRectDrawn.height() / mItemHeight;
+		visibleItemCount = rectItem.height() / itemHeight;
 		updateVisibleItemCount();
 
 		// Initialize fling max Y-coordinates
@@ -296,119 +288,109 @@ public class WheelPicker extends View implements Runnable {
 		updateContentPositions();
 	}
 
-	private void computeDrawnCenter() {
-		mDrawnCenterX = mWheelCenterX;
-		mDrawnCenterY = (int) (mWheelCenterY - ((mPaint.ascent() + mPaint.descent()) / 2));
-	}
-
 	private void computeFlingLimitY() {
-		int currentItemOffset = mSelectedItemPosition * mItemHeight;
-		mMinFlingY = -mItemHeight * (mAdapter.getSize() - 1) + currentItemOffset;
-		mMaxFlingY = currentItemOffset;
+		int currentItemOffset = selectedItemPosition * itemHeight;
+		minFlingY = -itemHeight * (adapter.getSize() - 1) + currentItemOffset;
+		maxFlingY = currentItemOffset;
 	}
 
 	private void computeCurrentItemRect() {
-		if (!mSelectedItemTextColorEnabled) {
-			return;
+		if (textColor != textColorSelected) {
+			rectCurrentItem.set(rectItem.left, wheelCenterY - itemHeight / 2, rectItem.right, wheelCenterY + itemHeight / 2);
 		}
-		mRectCurrentItem.set(mRectDrawn.left, mWheelCenterY - mHalfItemHeight, mRectDrawn.right,
-				mWheelCenterY + mHalfItemHeight);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		int drawnDataStartPos = -mScrollOffsetY / mItemHeight - mHalfDrawnItemCount;
-		for (int drawnDataPos = drawnDataStartPos + mSelectedItemPosition,
-			 drawnOffsetPos = -mHalfDrawnItemCount;
-			 drawnDataPos < drawnDataStartPos + mSelectedItemPosition + mDrawnItemCount;
+		int drawnDataStartPos = -scrollOffsetY / itemHeight - drawnItemCount / 2;
+		for (int drawnDataPos = drawnDataStartPos + selectedItemPosition,
+			 drawnOffsetPos = -drawnItemCount / 2;
+			 drawnDataPos < drawnDataStartPos + selectedItemPosition + drawnItemCount;
 			 drawnDataPos++, drawnOffsetPos++) {
 
 			String data = "";
 			Bitmap icon = null;
 
-			if (isPosInRang(drawnDataPos)) {
-				data = String.valueOf(mAdapter.getData().get(drawnDataPos));
-				if (mItemIconEnabled) {
-					icon = ((WheelItem) mAdapter.getData().get(drawnDataPos)).getIcon();
-				}
+			if (isPosInRange(drawnDataPos)) {
+				WheelItem item = adapter.getData().get(drawnDataPos);
+				data = String.valueOf(item);
+				icon = item.getIcon();
 			}
 
-			int mDrawnItemCenterY = mDrawnCenterY + (drawnOffsetPos * mItemHeight) +
-					mScrollOffsetY % mItemHeight;
+			int mDrawnItemCenterY = drawnCenterY + (drawnOffsetPos * itemHeight) +
+					scrollOffsetY % itemHeight;
 
 			if (hasAtmospheric) {
-				int alpha = (int) ((mDrawnCenterY - Math.abs(mDrawnCenterY - mDrawnItemCenterY)) *
-						1.0F / mDrawnCenterY * 255);
+				int alpha = (int) ((drawnCenterY - Math.abs(drawnCenterY - mDrawnItemCenterY)) * 1.0F / drawnCenterY * 255);
 				alpha = alpha < 0 ? 0 : alpha;
-				mPaint.setAlpha(alpha);
+				textPaint.setAlpha(alpha);
 			}
 
 			int iconTop = 0;
 
 			if (icon != null) {
-				iconTop = mWheelCenterY + (drawnOffsetPos * mItemHeight) + mScrollOffsetY % mItemHeight - icon.getHeight() / 2;
+				iconTop = wheelCenterY + (drawnOffsetPos * itemHeight) + scrollOffsetY % itemHeight - icon.getHeight() / 2;
 			}
 
 			// Judges need to draw different color for current item or not
-			if (mSelectedItemTextColorEnabled) {
+			if (textColor != textColorSelected) {
 				canvas.save();
-				canvas.clipRect(mRectCurrentItem, Region.Op.DIFFERENCE);
+				canvas.clipRect(rectCurrentItem, Region.Op.DIFFERENCE);
 
 				if (icon != null) {
-					canvas.drawBitmap(icon, rectIcon.left, iconTop, mPaint);
+					canvas.drawBitmap(icon, rectIcon.left, iconTop, textPaint);
 				}
 
-				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, mPaint);
+				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, textPaint);
 				canvas.restore();
 
 				canvas.save();
-				canvas.clipRect(mRectCurrentItem);
+				canvas.clipRect(rectCurrentItem);
 
 				if (icon != null) {
-					canvas.drawBitmap(icon, rectIcon.left, iconTop, mSelectedPaint);
+					canvas.drawBitmap(icon, rectIcon.left, iconTop, selectedTextPaint);
 				}
 
-				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, mSelectedPaint);
+				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, selectedTextPaint);
 				canvas.restore();
 			} else {
 				canvas.save();
-				canvas.clipRect(mRectDrawn);
+				canvas.clipRect(rectItem);
 
 				if (icon != null) {
-					canvas.drawBitmap(icon, rectIcon.left, iconTop, mPaint);
+					canvas.drawBitmap(icon, rectIcon.left, iconTop, textPaint);
 				}
 
-				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, mPaint);
+				canvas.drawText(data, rectText.centerX(), mDrawnItemCenterY, textPaint);
 				canvas.restore();
 			}
 
-			if (isDebug) {
+			if (DEBUG) {
 				canvas.save();
-				canvas.clipRect(mRectDrawn);
-				mPaint.setColor(0xFFEE3333);
-				int lineCenterY = mWheelCenterY + (drawnOffsetPos * mItemHeight);
-				canvas.drawLine(mRectDrawn.left, lineCenterY, mRectDrawn.right, lineCenterY,
-						mPaint);
-				mPaint.setColor(0xFF3333EE);
-				mPaint.setStyle(Paint.Style.STROKE);
-				int top = lineCenterY - mHalfItemHeight;
-				canvas.drawRect(mRectDrawn.left, top, mRectDrawn.right, top + mItemHeight, mPaint);
+				canvas.clipRect(rectItem);
+				textPaint.setColor(0xFFEE3333);
+				int lineCenterY = wheelCenterY + (drawnOffsetPos * itemHeight);
+				canvas.drawLine(rectItem.left, lineCenterY, rectItem.right, lineCenterY, textPaint);
+				textPaint.setColor(0xFF3333EE);
+				textPaint.setStyle(Paint.Style.STROKE);
+				int top = lineCenterY - itemHeight / 2;
+				canvas.drawRect(rectItem.left, top, rectItem.right, top + itemHeight, textPaint);
 				canvas.restore();
 			}
 		}
 
-		if (isDebug) {
-			mPaint.setColor(0x4433EE33);
-			mPaint.setStyle(Paint.Style.FILL);
-			canvas.drawRect(0, 0, getPaddingLeft(), getHeight(), mPaint);
-			canvas.drawRect(0, 0, getWidth(), getPaddingTop(), mPaint);
-			canvas.drawRect(getWidth() - getPaddingRight(), 0, getWidth(), getHeight(), mPaint);
-			canvas.drawRect(0, getHeight() - getPaddingBottom(), getWidth(), getHeight(), mPaint);
+		if (DEBUG) {
+			textPaint.setColor(0x4433EE33);
+			textPaint.setStyle(Paint.Style.FILL);
+			canvas.drawRect(0, 0, getPaddingLeft(), getHeight(), textPaint);
+			canvas.drawRect(0, 0, getWidth(), getPaddingTop(), textPaint);
+			canvas.drawRect(getWidth() - getPaddingRight(), 0, getWidth(), getHeight(), textPaint);
+			canvas.drawRect(0, getHeight() - getPaddingBottom(), getWidth(), getHeight(), textPaint);
 		}
 	}
 
-	private boolean isPosInRang(int position) {
-		return position >= 0 && position < mAdapter.getSize();
+	private boolean isPosInRange(int position) {
+		return position >= 0 && position < adapter.getSize();
 	}
 
 	@Override
@@ -419,36 +401,36 @@ public class WheelPicker extends View implements Runnable {
 				if (null != getParent()) {
 					getParent().requestDisallowInterceptTouchEvent(true);
 				}
-				if (null == mTracker) {
-					mTracker = VelocityTracker.obtain();
+				if (null == tracker) {
+					tracker = VelocityTracker.obtain();
 				} else {
-					mTracker.clear();
+					tracker.clear();
 				}
-				mTracker.addMovement(event);
-				if (!mScroller.isFinished()) {
-					mScroller.abortAnimation();
+				tracker.addMovement(event);
+				if (!scroller.isFinished()) {
+					scroller.abortAnimation();
 					isForceFinishScroll = true;
 				}
-				mDownPointY = mLastPointY = (int) event.getY();
+				downPointY = lastPointY = (int) event.getY();
 				break;
 			case MotionEvent.ACTION_MOVE:
-				if (Math.abs(mDownPointY - event.getY()) < TOUCH_SLOP) {
+				if (Math.abs(downPointY - event.getY()) < TOUCH_SLOP) {
 					isClick = true;
 					break;
 				}
 				isClick = false;
-				mTracker.addMovement(event);
-				if (null != mOnWheelChangeListener) {
-					mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_DRAGGING);
+				tracker.addMovement(event);
+				if (null != onWheelChangeListener) {
+					onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_DRAGGING);
 				}
 
 				// Scroll WheelPicker's content
-				float move = event.getY() - mLastPointY;
+				float move = event.getY() - lastPointY;
 				if (Math.abs(move) < 1) {
 					break;
 				}
-				mScrollOffsetY += move;
-				mLastPointY = (int) event.getY();
+				scrollOffsetY += move;
+				lastPointY = (int) event.getY();
 				invalidate();
 
 				break;
@@ -459,56 +441,56 @@ public class WheelPicker extends View implements Runnable {
 				if (isClick && !isForceFinishScroll) {
 					break;
 				}
-				mTracker.addMovement(event);
+				tracker.addMovement(event);
 
-				mTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+				tracker.computeCurrentVelocity(1000, maximumVelocity);
 
 				// Judges the WheelPicker is scroll or fling base on current velocity
 				isForceFinishScroll = false;
-				int velocity = (int) mTracker.getYVelocity();
+				int velocity = (int) tracker.getYVelocity();
 
-				if (Math.abs(velocity) > mMinimumVelocity && !(mScrollOffsetY > mMaxFlingY) && !(mScrollOffsetY < mMinFlingY)) {
+				if (Math.abs(velocity) > minimumVelocity && !(scrollOffsetY > maxFlingY) && !(scrollOffsetY < minFlingY)) {
 					if (Math.abs(velocity) > QUICK_SCROLL_VELOCITY) {
 						int dy = 0;
 
 						if (velocity > 0) {
-							dy = -mScrollOffsetY;
+							dy = -scrollOffsetY;
 						}
 						if (velocity < 0) {
-							dy = -(Math.abs(mMinFlingY) - Math.abs(mScrollOffsetY));
+							dy = -(Math.abs(minFlingY) - Math.abs(scrollOffsetY));
 						}
 
-						mScroller.startScroll(0, mScrollOffsetY, 0, dy, 500);
+						scroller.startScroll(0, scrollOffsetY, 0, dy, 500);
 					} else {
-						mScroller.fling(0, mScrollOffsetY, 0, velocity, 0, 0, mMinFlingY, mMaxFlingY);
-						mScroller.setFinalY(mScroller.getFinalY() +
-								computeDistanceToEndPoint(mScroller.getFinalY() % mItemHeight));
+						scroller.fling(0, scrollOffsetY, 0, velocity, 0, 0, minFlingY, maxFlingY);
+						scroller.setFinalY(scroller.getFinalY() +
+								computeDistanceToEndPoint(scroller.getFinalY() % itemHeight));
 					}
 				} else {
-					mScroller.startScroll(0, mScrollOffsetY, 0,
-							computeDistanceToEndPoint(mScrollOffsetY % mItemHeight));
+					scroller.startScroll(0, scrollOffsetY, 0,
+							computeDistanceToEndPoint(scrollOffsetY % itemHeight));
 				}
 
 				// Correct coordinates
-				if (mScroller.getFinalY() > mMaxFlingY) {
-					mScroller.setFinalY(mMaxFlingY);
-				} else if (mScroller.getFinalY() < mMinFlingY) {
-					mScroller.setFinalY(mMinFlingY);
+				if (scroller.getFinalY() > maxFlingY) {
+					scroller.setFinalY(maxFlingY);
+				} else if (scroller.getFinalY() < minFlingY) {
+					scroller.setFinalY(minFlingY);
 				}
 
-				mHandler.post(this);
-				if (null != mTracker) {
-					mTracker.recycle();
-					mTracker = null;
+				handler.post(this);
+				if (null != tracker) {
+					tracker.recycle();
+					tracker = null;
 				}
 				break;
 			case MotionEvent.ACTION_CANCEL:
 				if (null != getParent()) {
 					getParent().requestDisallowInterceptTouchEvent(false);
 				}
-				if (null != mTracker) {
-					mTracker.recycle();
-					mTracker = null;
+				if (null != tracker) {
+					tracker.recycle();
+					tracker = null;
 				}
 				break;
 		}
@@ -516,11 +498,11 @@ public class WheelPicker extends View implements Runnable {
 	}
 
 	private int computeDistanceToEndPoint(int remainder) {
-		if (Math.abs(remainder) > mHalfItemHeight) {
-			if (mScrollOffsetY < 0) {
-				return -mItemHeight - remainder;
+		if (Math.abs(remainder) > itemHeight / 2) {
+			if (scrollOffsetY < 0) {
+				return -itemHeight - remainder;
 			} else {
-				return mItemHeight - remainder;
+				return itemHeight - remainder;
 			}
 		} else {
 			return -remainder;
@@ -529,37 +511,38 @@ public class WheelPicker extends View implements Runnable {
 
 	@Override
 	public void run() {
-		if (null == mAdapter || mAdapter.getSize() == 0) {
+		if (null == adapter || adapter.getSize() == 0) {
 			return;
 		}
 
-		if (mScroller.isFinished() && !isForceFinishScroll) {
-			if (mItemHeight == 0) {
+		if (scroller.isFinished() && !isForceFinishScroll) {
+			if (itemHeight == 0) {
 				return;
 			}
 
-			int position = (-mScrollOffsetY / mItemHeight + mSelectedItemPosition) % mAdapter.getSize();
-			position = position < 0 ? position + mAdapter.getSize() : position;
+			int position = (-scrollOffsetY / itemHeight + selectedItemPosition) % adapter.getSize();
+			position = position < 0 ? position + adapter.getSize() : position;
 
-			if (isDebug) {
-				Log.i(TAG, position + ":" + mAdapter.getData().get(position) + ":" + mScrollOffsetY);
+			if (DEBUG) {
+				Log.i(TAG, position + ":" + adapter.getData().get(position) + ":" + scrollOffsetY);
 			}
-			mCurrentItemPosition = position;
-			if (mAdapter != null) {
-				mAdapter.onItemSelected(position);
+
+			currentItemPosition = position;
+			if (adapter != null) {
+				adapter.onItemSelected(position);
 			}
-			if (null != mOnWheelChangeListener && isTouchTriggered) {
-				mOnWheelChangeListener.onWheelSelected(position);
-				mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
+			if (null != onWheelChangeListener && isTouchTriggered) {
+				onWheelChangeListener.onWheelSelected(position);
+				onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
 			}
 		}
-		if (mScroller.computeScrollOffset()) {
-			if (null != mOnWheelChangeListener) {
-				mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING);
+		if (scroller.computeScrollOffset()) {
+			if (null != onWheelChangeListener) {
+				onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING);
 			}
-			mScrollOffsetY = mScroller.getCurrY();
+			scrollOffsetY = scroller.getCurrY();
 			postInvalidate();
-			mHandler.postDelayed(this, 16);
+			handler.postDelayed(this, 16);
 		}
 	}
 
@@ -567,7 +550,7 @@ public class WheelPicker extends View implements Runnable {
 	 * Get the count of current visible items in WheelPicker
 	 */
 	public int getVisibleItemCount() {
-		return mVisibleItemCount;
+		return visibleItemCount;
 	}
 
 	/**
@@ -578,13 +561,13 @@ public class WheelPicker extends View implements Runnable {
 	 * By default, the count of current visible items in WheelPicker is 7
 	 */
 	public void setVisibleItemCount(int count) {
-		mVisibleItemCount = count;
+		visibleItemCount = count;
 		updateVisibleItemCount();
 		requestLayout();
 	}
 
 	int getSelectedItemPosition() {
-		return mSelectedItemPosition;
+		return selectedItemPosition;
 	}
 
 	void setSelectedItemPosition(int position) {
@@ -593,23 +576,23 @@ public class WheelPicker extends View implements Runnable {
 
 	void setSelectedItemPosition(int position, final boolean animated) {
 		isTouchTriggered = false;
-		if (animated && mScroller.isFinished()) { // We go non-animated regardless of "animated" parameter if scroller is in motion
-			int itemDifference = position - mCurrentItemPosition;
+		if (animated && scroller.isFinished()) { // We go non-animated regardless of "animated" parameter if scroller is in motion
+			int itemDifference = position - currentItemPosition;
 			if (itemDifference == 0) {
 				return;
 			}
 
-			mScroller.startScroll(0, mScroller.getCurrY(), 0, (-itemDifference) * mItemHeight);
-			mHandler.post(this);
+			scroller.startScroll(0, scroller.getCurrY(), 0, (-itemDifference) * itemHeight);
+			handler.post(this);
 		} else {
-			if (!mScroller.isFinished()) {
-				mScroller.abortAnimation();
+			if (!scroller.isFinished()) {
+				scroller.abortAnimation();
 			}
-			position = Math.min(position, mAdapter.getSize() - 1);
+			position = Math.min(position, adapter.getSize() - 1);
 			position = Math.max(position, 0);
-			mSelectedItemPosition = position;
-			mCurrentItemPosition = position;
-			mScrollOffsetY = 0;
+			selectedItemPosition = position;
+			currentItemPosition = position;
+			scrollOffsetY = 0;
 			computeFlingLimitY();
 			requestLayout();
 			invalidate();
@@ -617,21 +600,21 @@ public class WheelPicker extends View implements Runnable {
 	}
 
 	int getCurrentItemPosition() {
-		return mCurrentItemPosition;
+		return currentItemPosition;
 	}
 
 	void setAdapter(WheelAdapter adapter) {
 		if (null == adapter) {
 			throw new NullPointerException("WheelAdapter can not be null!");
 		}
-		mAdapter = adapter;
+		this.adapter = adapter;
 
-		if (mSelectedItemPosition > mAdapter.getSize() - 1 || mCurrentItemPosition > mAdapter.getSize() - 1) {
-			mSelectedItemPosition = mCurrentItemPosition = mAdapter.getSize() - 1;
+		if (selectedItemPosition > this.adapter.getSize() - 1 || currentItemPosition > this.adapter.getSize() - 1) {
+			selectedItemPosition = currentItemPosition = this.adapter.getSize() - 1;
 		} else {
-			mSelectedItemPosition = mCurrentItemPosition;
+			selectedItemPosition = currentItemPosition;
 		}
-		mScrollOffsetY = 0;
+		scrollOffsetY = 0;
 		computeTextSize();
 		computeFlingLimitY();
 		requestLayout();
@@ -668,18 +651,18 @@ public class WheelPicker extends View implements Runnable {
 	}
 
 	public void setOnWheelChangeListener(OnWheelChangeListener listener) {
-		mOnWheelChangeListener = listener;
+		onWheelChangeListener = listener;
 	}
 
 	public String getMaximumWidthText() {
-		return mMaxWidthText;
+		return maxWidthText;
 	}
 
 	public void setMaximumWidthText(String text) {
 		if (null == text) {
 			throw new NullPointerException("Maximum width text can not be null!");
 		}
-		mMaxWidthText = text;
+		maxWidthText = text;
 		computeTextSize();
 		requestLayout();
 		invalidate();
@@ -689,61 +672,19 @@ public class WheelPicker extends View implements Runnable {
 	 * Get the position of maximum width text in data source
 	 */
 	public int getMaximumWidthTextPosition() {
-		return mTextMaxWidthPosition;
+		return textMaxWidthPosition;
 	}
 
 	/**
 	 * Set the position of maximum width text in data source
 	 */
 	public void setMaximumWidthTextPosition(int position) {
-		if (!isPosInRang(position)) {
+		if (!isPosInRange(position)) {
 			throw new ArrayIndexOutOfBoundsException("Maximum width text Position must in [0, " +
-					mAdapter.getSize() + "), but current is " + position);
+					adapter.getSize() + "), but current is " + position);
 		}
-		mTextMaxWidthPosition = position;
+		textMaxWidthPosition = position;
 		computeTextSize();
-		requestLayout();
-		invalidate();
-	}
-
-	public int getSelectedItemTextColor() {
-		return mSelectedItemTextColor;
-	}
-
-	public void setSelectedItemTextColor(int color) {
-		mSelectedItemTextColor = color;
-		computeCurrentItemRect();
-		invalidate();
-	}
-
-	public int getItemTextColor() {
-		return mItemTextColor;
-	}
-
-	public void setItemTextColor(int color) {
-		mItemTextColor = color;
-		invalidate();
-	}
-
-	public int getItemTextSize() {
-		return mItemTextSize;
-	}
-
-	public void setItemTextSize(int size) {
-		mItemTextSize = size;
-		mPaint.setTextSize(mItemTextSize);
-		mSelectedPaint.setTextSize(mItemTextSize);
-		computeTextSize();
-		requestLayout();
-		invalidate();
-	}
-
-	public int getItemSpace() {
-		return mItemSpace;
-	}
-
-	public void setItemSpace(int space) {
-		mItemSpace = space;
 		requestLayout();
 		invalidate();
 	}
@@ -765,18 +706,18 @@ public class WheelPicker extends View implements Runnable {
 	}
 
 	public Typeface getTypeface() {
-		if (null != mPaint) {
-			return mPaint.getTypeface();
+		if (null != textPaint) {
+			return textPaint.getTypeface();
 		}
 		return null;
 	}
 
 	public void setTypeface(Typeface tf) {
-		if (null != mPaint) {
-			mPaint.setTypeface(tf);
+		if (null != textPaint) {
+			textPaint.setTypeface(tf);
 		}
-		if (mSelectedPaint != null) {
-			mSelectedPaint.setTypeface(tf);
+		if (selectedTextPaint != null) {
+			selectedTextPaint.setTypeface(tf);
 		}
 		computeTextSize();
 		requestLayout();
@@ -820,5 +761,13 @@ public class WheelPicker extends View implements Runnable {
 		 * 		Express WheelPicker in state of scrolling
 		 */
 		void onWheelScrollStateChanged(int state);
+	}
+
+	private int dpToPx(int value) {
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getContext().getResources().getDisplayMetrics());
+	}
+
+	private int spToPx(int value) {
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, getContext().getResources().getDisplayMetrics());
 	}
 }
