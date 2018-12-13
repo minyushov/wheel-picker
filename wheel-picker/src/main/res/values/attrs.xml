@@ -2,20 +2,14 @@
 <resources>
 	<declare-styleable name="WheelPicker">
 		<attr name="wheel_selected_item_position" format="integer" />
-		<attr name="wheel_item_text_size" format="dimension" />
-		<attr name="wheel_item_text_color" format="color" />
-		<attr name="wheel_selected_item_text_color" format="color" />
+		<attr name="android:textSize" />
+		<attr name="android:textColor" />
 		<attr name="wheel_same_width" format="boolean" />
 		<attr name="wheel_maximum_width_text" format="string" />
 		<attr name="wheel_maximum_width_text_position" format="integer" />
 		<attr name="wheel_item_height" format="dimension" />
-		<attr name="wheel_item_space" format="dimension" />
-		<attr name="wheel_item_icon_enabled" format="boolean" />
+		<attr name="wheel_drawableSize" format="dimension" />
+		<attr name="android:drawablePadding" />
 		<attr name="wheel_atmospheric" format="boolean" />
-		<attr name="wheel_item_align" format="enum">
-			<enum name="center" value="0" />
-			<enum name="left" value="1" />
-			<enum name="right" value="2" />
-		</attr>
 	</declare-styleable>
 </resources>

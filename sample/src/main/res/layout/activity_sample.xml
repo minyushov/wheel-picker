@@ -14,15 +14,15 @@
 		android:layout_height="0dp"
 		android:layout_marginBottom="100dp"
 		android:layout_marginTop="100dp"
+		android:drawablePadding="4dp"
+		android:textColor="@color/text_color"
+		android:textSize="17sp"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
 		app:wheel_atmospheric="true"
-		app:wheel_item_height="44dp"
-		app:wheel_item_icon_enabled="true"
-		app:wheel_item_text_color="#6c6c6c"
-		app:wheel_item_text_size="17sp"
-		app:wheel_selected_item_text_color="#ed3b00" />
+		app:wheel_drawableSize="18dp"
+		app:wheel_item_height="44dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

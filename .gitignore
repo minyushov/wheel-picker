@@ -9,3 +9,5 @@
 *.iml
 .idea/caches
 .idea/modules.xml
+.idea/compiler.xml
+.idea/gradle.xml
