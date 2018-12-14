@@ -439,6 +439,18 @@ public class WheelPicker extends View implements Runnable {
 					getParent().requestDisallowInterceptTouchEvent(false);
 				}
 				if (isClick && !isForceFinishScroll) {
+					float clickY = event.getY();
+					float difference = clickY - drawnCenterY;
+					if (clickY > drawnCenterY) {
+						difference += itemHeight / 2.0;
+					} else {
+						difference -= itemHeight / 2.0;
+					}
+
+					int newSelectedPosition = (int) (difference / itemHeight) + currentItemPosition;
+					if (currentItemPosition != newSelectedPosition && newSelectedPosition >= 0 && newSelectedPosition < adapter.getSize()) {
+						setSelectedItemPosition(newSelectedPosition);
+					}
 					break;
 				}
 				tracker.addMovement(event);
