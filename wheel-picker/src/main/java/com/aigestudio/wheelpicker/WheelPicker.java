@@ -39,7 +39,7 @@ public class WheelPicker extends View implements Runnable {
 	private final Paint textPaint;
 	private final Paint selectedTextPaint;
 
-	private final Scroller scroller;
+	private Scroller scroller;
 	private VelocityTracker tracker;
 
 	/**
@@ -289,7 +289,7 @@ public class WheelPicker extends View implements Runnable {
 	}
 
 	private void computeFlingLimitY() {
-		int currentItemOffset = selectedItemPosition * itemHeight;
+		int currentItemOffset = currentItemPosition * itemHeight;
 		minFlingY = -itemHeight * (adapter.getSize() - 1) + currentItemOffset;
 		maxFlingY = currentItemOffset;
 	}
@@ -466,13 +466,13 @@ public class WheelPicker extends View implements Runnable {
 						int dy = 0;
 
 						if (velocity > 0) {
-							dy = -scrollOffsetY;
+							dy = maxFlingY + computeDistanceToEndPoint(maxFlingY % itemHeight);
 						}
 						if (velocity < 0) {
-							dy = -(Math.abs(minFlingY) - Math.abs(scrollOffsetY));
+							dy = minFlingY + computeDistanceToEndPoint(minFlingY % itemHeight);
 						}
 
-						scroller.startScroll(0, scrollOffsetY, 0, dy, 500);
+						scroller.startScroll(0, scrollOffsetY, 0, dy, 300);
 					} else {
 						scroller.fling(0, scrollOffsetY, 0, velocity, 0, 0, minFlingY, maxFlingY);
 						scroller.setFinalY(scroller.getFinalY() +
@@ -534,6 +534,7 @@ public class WheelPicker extends View implements Runnable {
 
 			int position = (-scrollOffsetY / itemHeight + selectedItemPosition) % adapter.getSize();
 			position = position < 0 ? position + adapter.getSize() : position;
+			int difference = scrollOffsetY % itemHeight;
 
 			if (DEBUG) {
 				Log.i(TAG, position + ":" + adapter.getData().get(position) + ":" + scrollOffsetY);
@@ -546,6 +547,12 @@ public class WheelPicker extends View implements Runnable {
 			if (null != onWheelChangeListener && isTouchTriggered) {
 				onWheelChangeListener.onWheelSelected(position);
 				onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
+			}
+
+			if (difference != 0) {
+				scroller.startScroll(0, scrollOffsetY, 0, -difference);
+			} else {
+				setSelectedItemPosition(position, false);
 			}
 		}
 		if (scroller.computeScrollOffset()) {
@@ -605,6 +612,7 @@ public class WheelPicker extends View implements Runnable {
 			selectedItemPosition = position;
 			currentItemPosition = position;
 			scrollOffsetY = 0;
+			scroller = newScroller(scrollOffsetY);
 			computeFlingLimitY();
 			requestLayout();
 			invalidate();
@@ -621,12 +629,13 @@ public class WheelPicker extends View implements Runnable {
 		}
 		this.adapter = adapter;
 
-		if (selectedItemPosition > this.adapter.getSize() - 1 || currentItemPosition > this.adapter.getSize() - 1) {
+		if (adapter.getSize() > 0 && (selectedItemPosition > this.adapter.getSize() - 1 || currentItemPosition > this.adapter.getSize() - 1)) {
 			selectedItemPosition = currentItemPosition = this.adapter.getSize() - 1;
 		} else {
 			selectedItemPosition = currentItemPosition;
 		}
-		scrollOffsetY = 0;
+		scrollOffsetY = -itemHeight * selectedItemPosition;
+		scroller = newScroller(scrollOffsetY);
 		computeTextSize();
 		computeFlingLimitY();
 		requestLayout();
@@ -781,5 +790,12 @@ public class WheelPicker extends View implements Runnable {
 
 	private int spToPx(int value) {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, getContext().getResources().getDisplayMetrics());
+	}
+
+	private Scroller newScroller(int currentOffsetY) {
+		Scroller scroller = new Scroller(getContext());
+		scroller.setFinalY(currentOffsetY);
+		scroller.abortAnimation();
+		return scroller;
 	}
 }

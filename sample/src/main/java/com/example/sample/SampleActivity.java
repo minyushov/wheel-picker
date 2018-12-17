@@ -57,5 +57,7 @@ public class SampleActivity extends AppCompatActivity {
 			}
 		});
 		adapter.bind(wheelPicker3);
+
+		adapter.setSelectedItemPosition(15);
 	}
 }
