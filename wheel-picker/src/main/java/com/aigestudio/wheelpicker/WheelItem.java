@@ -43,12 +43,4 @@ public final class WheelItem<T> {
 			return "";
 		}
 	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		if (icon != null) {
-			icon.recycle();
-		}
-	}
 }
