@@ -398,6 +398,7 @@ public class WheelPicker extends View implements Runnable {
 		switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 				isTouchTriggered = true;
+				isClick = true;
 				if (null != getParent()) {
 					getParent().requestDisallowInterceptTouchEvent(true);
 				}
@@ -415,7 +416,6 @@ public class WheelPicker extends View implements Runnable {
 				break;
 			case MotionEvent.ACTION_MOVE:
 				if (Math.abs(downPointY - event.getY()) < TOUCH_SLOP) {
-					isClick = true;
 					break;
 				}
 				isClick = false;

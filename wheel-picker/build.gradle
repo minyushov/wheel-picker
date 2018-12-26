@@ -14,7 +14,7 @@ bintrayUpload {
 	repo = "android"
 	organization = "mercdev"
 	groupId = "com.mercdev.android"
-	version = "0.0.8"
+	version = "0.0.9"
 	vcsUrl = "https://github.com/minyushov/WheelPicker.git"
 	license = "Apache-2.0"
 	docs = false
