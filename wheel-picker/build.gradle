@@ -7,6 +7,11 @@ android {
 		minSdkVersion 19
 		targetSdkVersion 28
 	}
+	libraryVariants.all {
+		it.generateBuildConfigProvider.configure {
+			it.enabled = false
+		}
+	}
 }
 
 bintrayUpload {
@@ -14,7 +19,7 @@ bintrayUpload {
 	repo = "android"
 	organization = "mercdev"
 	groupId = "com.mercdev.android"
-	version = "0.0.9"
+	version = "0.0.10"
 	vcsUrl = "https://github.com/minyushov/WheelPicker.git"
 	license = "Apache-2.0"
 	docs = false
