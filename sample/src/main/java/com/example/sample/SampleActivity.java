@@ -50,12 +50,7 @@ public class SampleActivity extends AppCompatActivity {
 
 		WheelAdapter<String> adapter = new WheelAdapter<>();
 		adapter.setData(data);
-		adapter.setOnItemSelectedListener(new WheelAdapter.OnItemSelectedListener<String>() {
-			@Override
-			public void onItemSelected(String item) {
-				Log.d(TAG, "onItemSelected: " + item);
-			}
-		});
+		adapter.setOnItemSelectedListener(item -> Log.d(TAG, "onItemSelected: " + item));
 		adapter.bind(wheelPicker3);
 
 		adapter.setSelectedItemPosition(15);

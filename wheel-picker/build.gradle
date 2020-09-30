@@ -2,24 +2,23 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.minyushov.bintray'
 
 android {
-	compileSdkVersion 28
+	compileSdkVersion 30
 	defaultConfig {
 		minSdkVersion 19
-		targetSdkVersion 28
+		targetSdkVersion 30
 	}
-	libraryVariants.all {
-		it.generateBuildConfigProvider.configure {
-			it.enabled = false
-		}
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
 	}
 }
 
-bintrayUpload {
+bintray {
 	artifactId = "wheel-picker"
 	repo = "android"
 	organization = "mercdev"
 	groupId = "com.mercdev.android"
-	version = "0.0.10"
+	version = "0.0.11"
 	vcsUrl = "https://github.com/minyushov/WheelPicker.git"
 	license = "Apache-2.0"
 	docs = false
