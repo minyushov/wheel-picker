@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
+import androidx.appcompat.content.res.AppCompatResources;
+
 public class WheelPicker extends View implements Runnable {
 	private static final String TAG = "WheelPicker";
 	private static final boolean DEBUG = false;
@@ -109,7 +111,7 @@ public class WheelPicker extends View implements Runnable {
 
 		TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker);
 
-		ColorStateList colorStateList = typedArray.getColorStateList(R.styleable.WheelPicker_android_textColor);
+		ColorStateList colorStateList = getColorStateList(typedArray, R.styleable.WheelPicker_android_textColor);
 		if (colorStateList == null) {
 			colorStateList = ColorStateList.valueOf(Color.BLACK);
 		}
@@ -797,5 +799,18 @@ public class WheelPicker extends View implements Runnable {
 		scroller.setFinalY(currentOffsetY);
 		scroller.abortAnimation();
 		return scroller;
+	}
+
+	public ColorStateList getColorStateList(TypedArray typedArray, int index) {
+		if (typedArray.hasValue(index)) {
+			final int resourceId = typedArray.getResourceId(index, 0);
+			if (resourceId != 0) {
+				final ColorStateList value = AppCompatResources.getColorStateList(getContext(), resourceId);
+				if (value != null) {
+					return value;
+				}
+			}
+		}
+		return typedArray.getColorStateList(index);
 	}
 }

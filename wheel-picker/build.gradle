@@ -13,12 +13,16 @@ android {
 	}
 }
 
+dependencies {
+	implementation 'androidx.appcompat:appcompat-resources:1.3.0-alpha02'
+}
+
 bintray {
 	artifactId = "wheel-picker"
 	repo = "android"
 	organization = "mercdev"
 	groupId = "com.mercdev.android"
-	version = "0.0.11"
+	version = "0.0.12"
 	vcsUrl = "https://github.com/minyushov/WheelPicker.git"
 	license = "Apache-2.0"
 	docs = false
