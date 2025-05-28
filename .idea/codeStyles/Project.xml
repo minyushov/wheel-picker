@@ -8,6 +8,13 @@
     </option>
     <option name="LINE_SEPARATOR" value="&#10;" />
     <option name="RIGHT_MARGIN" value="240" />
+    <AndroidXmlCodeStyleSettings>
+      <option name="LAYOUT_SETTINGS">
+        <value>
+          <option name="INSERT_LINE_BREAK_BEFORE_NAMESPACE_DECLARATION" value="true" />
+        </value>
+      </option>
+    </AndroidXmlCodeStyleSettings>
     <GroovyCodeStyleSettings>
       <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="1000000" />
       <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="1000000" />
@@ -65,7 +72,9 @@
     </XML>
     <codeStyleSettings language="Groovy">
       <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
         <option name="SMART_TABS" value="true" />
       </indentOptions>
     </codeStyleSettings>
@@ -84,7 +93,9 @@
       <option name="WHILE_BRACE_FORCE" value="3" />
       <option name="FOR_BRACE_FORCE" value="3" />
       <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="JSON">
@@ -100,8 +111,9 @@
     </codeStyleSettings>
     <codeStyleSettings language="XML">
       <indentOptions>
-        <option name="CONTINUATION_INDENT_SIZE" value="4" />
-        <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
         <option name="SMART_TABS" value="true" />
       </indentOptions>
       <arrangement>

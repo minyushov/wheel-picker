@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<declare-styleable name="WheelPicker">
-		<attr name="wheel_selected_item_position" format="integer" />
-		<attr name="android:textSize" />
-		<attr name="android:textColor" />
-		<attr name="wheel_same_width" format="boolean" />
-		<attr name="wheel_maximum_width_text" format="string" />
-		<attr name="wheel_maximum_width_text_position" format="integer" />
-		<attr name="wheel_item_height" format="dimension" />
-		<attr name="wheel_drawableSize" format="dimension" />
-		<attr name="android:drawablePadding" />
-		<attr name="wheel_atmospheric" format="boolean" />
-	</declare-styleable>
+
+  <declare-styleable name="WheelPicker">
+    <attr name="android:drawablePadding" />
+    <attr name="android:textColor" />
+    <attr name="android:textSize" />
+    <attr name="wheel_selected_item_position" format="integer" />
+    <attr name="wheel_same_width" format="boolean" />
+    <attr name="wheel_maximum_width_text" format="string" />
+    <attr name="wheel_maximum_width_text_position" format="integer" />
+    <attr name="wheel_item_height" format="dimension" />
+    <attr name="wheel_drawableSize" format="dimension" />
+    <attr name="wheel_atmospheric" format="boolean" />
+  </declare-styleable>
+
 </resources>
