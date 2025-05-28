@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.Px;
 import androidx.appcompat.content.res.AppCompatResources;
 
 public class WheelPicker extends View implements Runnable {
@@ -69,13 +71,18 @@ public class WheelPicker extends View implements Runnable {
   private int textMaxWidth;
   private int textMaxHeight;
 
-  private final int textColor;
-  private final int textColorSelected;
+  @ColorInt
+  private int textColor;
+  @ColorInt
+  private int textColorSelected;
 
-  private final int drawableSize;
-  private final int drawablePadding;
+  @Px
+  private int drawableSize;
+  @Px
+  private int drawablePadding;
 
-  private final int itemHeight;
+  @Px
+  private int itemHeight;
 
   private int selectedItemPosition;
   private int currentItemPosition;
@@ -115,8 +122,8 @@ public class WheelPicker extends View implements Runnable {
     if (colorStateList == null) {
       colorStateList = ColorStateList.valueOf(Color.BLACK);
     }
-    this.textColor = colorStateList.getColorForState(View.EMPTY_STATE_SET, Color.BLACK);
-    this.textColorSelected = colorStateList.getColorForState(View.SELECTED_STATE_SET, Color.BLACK);
+    textColor = colorStateList.getColorForState(View.EMPTY_STATE_SET, Color.BLACK);
+    textColorSelected = colorStateList.getColorForState(View.SELECTED_STATE_SET, Color.BLACK);
 
     int textSize = typedArray.getDimensionPixelSize(R.styleable.WheelPicker_android_textSize, spToPx(12));
 
@@ -150,6 +157,51 @@ public class WheelPicker extends View implements Runnable {
     ViewConfiguration conf = ViewConfiguration.get(getContext());
     minimumVelocity = conf.getScaledMinimumFlingVelocity();
     maximumVelocity = conf.getScaledMaximumFlingVelocity();
+  }
+
+  public void setTextColor(ColorStateList color) {
+    textColor = color.getColorForState(View.EMPTY_STATE_SET, Color.BLACK);
+    textColorSelected = color.getColorForState(View.SELECTED_STATE_SET, Color.BLACK);
+    selectedTextPaint.setColorFilter(new PorterDuffColorFilter(textColorSelected, PorterDuff.Mode.SRC_IN));
+    computeCurrentItemRect();
+    invalidate();
+  }
+
+  public void setTextColor(@ColorInt int color) {
+    textColor = color;
+    computeCurrentItemRect();
+    invalidate();
+  }
+
+  public void setSelectedTextColor(@ColorInt int color) {
+    textColorSelected = color;
+    selectedTextPaint.setColorFilter(new PorterDuffColorFilter(textColorSelected, PorterDuff.Mode.SRC_IN));
+    computeCurrentItemRect();
+    invalidate();
+  }
+
+  public void setTextSize(@Px int textSize) {
+    textPaint.setTextSize(textSize);
+    selectedTextPaint.setTextSize(textSize);
+    computeTextSize();
+    requestLayout();
+  }
+
+  public void setItemHeight(@Px int height) {
+    itemHeight = height;
+    requestLayout();
+  }
+
+  public void setDrawablePadding(@Px int padding) {
+    drawablePadding = padding;
+    updateContentPositions();
+    requestLayout();
+  }
+
+  public void setDrawableSize(@Px int size) {
+    drawableSize = size;
+    updateContentPositions();
+    requestLayout();
   }
 
   private void updateVisibleItemCount() {

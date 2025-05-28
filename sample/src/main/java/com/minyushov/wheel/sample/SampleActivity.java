@@ -46,12 +46,14 @@ public class SampleActivity extends AppCompatActivity {
     data.add(new WheelItem<>("Text 24"));
     data.add(new WheelItem<>("Text 25"));
 
-    WheelPicker wheelPicker3 = findViewById(R.id.wheel_picker);
+    WheelPicker wheel = findViewById(R.id.wheel_picker);
+    wheel.setTextColor(0xff6c6c6c);
+    wheel.setSelectedTextColor(0xffed3b00);
 
     WheelAdapter<String> adapter = new WheelAdapter<>();
     adapter.setData(data);
     adapter.setOnItemSelectedListener(item -> Log.d(TAG, "onItemSelected: " + item));
-    adapter.bind(wheelPicker3);
+    adapter.bind(wheel);
 
     adapter.setSelectedItemPosition(15);
   }
