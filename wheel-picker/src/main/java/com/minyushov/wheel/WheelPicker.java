@@ -162,6 +162,7 @@ public class WheelPicker extends View implements Runnable {
   public void setTextColor(ColorStateList color) {
     textColor = color.getColorForState(View.EMPTY_STATE_SET, Color.BLACK);
     textColorSelected = color.getColorForState(View.SELECTED_STATE_SET, Color.BLACK);
+    textPaint.setColorFilter(new PorterDuffColorFilter(textColor, PorterDuff.Mode.SRC_IN));
     selectedTextPaint.setColorFilter(new PorterDuffColorFilter(textColorSelected, PorterDuff.Mode.SRC_IN));
     computeCurrentItemRect();
     invalidate();
@@ -169,6 +170,7 @@ public class WheelPicker extends View implements Runnable {
 
   public void setTextColor(@ColorInt int color) {
     textColor = color;
+    textPaint.setColorFilter(new PorterDuffColorFilter(textColor, PorterDuff.Mode.SRC_IN));
     computeCurrentItemRect();
     invalidate();
   }

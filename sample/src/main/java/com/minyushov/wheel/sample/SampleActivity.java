@@ -1,5 +1,6 @@
 package com.minyushov.wheel.sample;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -47,8 +48,8 @@ public class SampleActivity extends AppCompatActivity {
     data.add(new WheelItem<>("Text 25"));
 
     WheelPicker wheel = findViewById(R.id.wheel_picker);
-    wheel.setTextColor(0xff6c6c6c);
-    wheel.setSelectedTextColor(0xffed3b00);
+    wheel.setTextColor(Color.GREEN);
+    wheel.setSelectedTextColor(Color.RED);
 
     WheelAdapter<String> adapter = new WheelAdapter<>();
     adapter.setData(data);
