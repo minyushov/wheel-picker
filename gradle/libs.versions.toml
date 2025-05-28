@@ -1,0 +1,27 @@
+[versions]
+agp = "8.12.0-alpha02"
+androidMinSdk = "24"
+androidCompileSdk = "36"
+androidTargetSdk = "36"
+androidBuildTools = "36.0.0"
+java = "21"
+
+# https://github.com/JetBrains/kotlin/releases
+kotlin = "2.1.21"
+
+[libraries]
+# https://developer.android.com/jetpack/androidx/releases/activity
+androidx-activity = "androidx.activity:activity:1.12.0-alpha01"
+
+# https://developer.android.com/jetpack/androidx/releases/appcompat
+androidx-appcompat = "androidx.appcompat:appcompat:1.7.0"
+androidx-appcompat-resources = "androidx.appcompat:appcompat-resources:1.7.0"
+
+# https://developer.android.com/jetpack/androidx/releases/constraintlayout
+androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.2.1"
+
+[plugins]
+android-app = { id = "com.android.application", version.ref = "agp" }
+android-lib = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+maven-publish = "com.vanniktech.maven.publish:0.32.0"
