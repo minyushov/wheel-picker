@@ -1,4 +1,4 @@
-package com.aigestudio.wheelpicker;
+package com.minyushov.wheel;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package com.aigestudio.wheelpicker;
+package com.minyushov.wheel;
 
 import java.util.List;
 

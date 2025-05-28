@@ -3,19 +3,20 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 android {
-	compileSdkVersion 30
+	namespace = "com.minyushov.wheel"
+	compileSdkVersion = 36
 	defaultConfig {
-		minSdkVersion 19
-		targetSdkVersion 30
+		minSdkVersion 24
+		targetSdkVersion 35
 	}
 	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_8
-		targetCompatibility JavaVersion.VERSION_1_8
+		sourceCompatibility = JavaVersion.VERSION_21
+		targetCompatibility = JavaVersion.VERSION_21
 	}
 }
 
 dependencies {
-	implementation 'androidx.appcompat:appcompat-resources:1.3.0-beta01'
+	implementation 'androidx.appcompat:appcompat-resources:1.7.0'
 }
 
 tasks.register("sourcesJar", Jar) {
@@ -35,7 +36,7 @@ afterEvaluate {
 	publishing {
 		publications {
 			maven(MavenPublication) {
-				groupId "io.github.minyushov"
+				groupId = "io.github.minyushov"
 				artifactId = "wheel-picker"
 				version = "1.0.0"
 
@@ -69,11 +70,11 @@ afterEvaluate {
 		}
 		repositories {
 			maven {
-				name "sonatype"
-				url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+				name = "sonatype"
+				url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 				credentials {
-					username properties["SONATYPE_USER"]
-					password properties["SONATYPE_PASSWORD"]
+					username = properties["SONATYPE_USER"]
+					password = properties["SONATYPE_PASSWORD"]
 				}
 			}
 		}

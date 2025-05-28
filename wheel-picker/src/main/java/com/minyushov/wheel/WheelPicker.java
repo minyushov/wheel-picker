@@ -1,4 +1,4 @@
-package com.aigestudio.wheelpicker;
+package com.minyushov.wheel;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -776,11 +776,11 @@ public class WheelPicker extends View implements Runnable {
 		 *
 		 * @param state
 		 * 		State of WheelPicker, only one of the following
-		 * 		{@link WheelPicker#SCROLL_STATE_IDLE}
+		 *        {@link WheelPicker#SCROLL_STATE_IDLE}
 		 * 		Express WheelPicker in state of idle
-		 * 		{@link WheelPicker#SCROLL_STATE_DRAGGING}
+		 *        {@link WheelPicker#SCROLL_STATE_DRAGGING}
 		 * 		Express WheelPicker in state of dragging
-		 * 		{@link WheelPicker#SCROLL_STATE_SCROLLING}
+		 *        {@link WheelPicker#SCROLL_STATE_SCROLLING}
 		 * 		Express WheelPicker in state of scrolling
 		 */
 		void onWheelScrollStateChanged(int state);

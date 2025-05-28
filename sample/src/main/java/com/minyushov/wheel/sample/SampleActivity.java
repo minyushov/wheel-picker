@@ -1,13 +1,13 @@
-package com.example.sample;
+package com.minyushov.wheel.sample;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
 
-import com.aigestudio.wheelpicker.WheelAdapter;
-import com.aigestudio.wheelpicker.WheelItem;
-import com.aigestudio.wheelpicker.WheelPicker;
+import com.minyushov.wheel.WheelAdapter;
+import com.minyushov.wheel.WheelItem;
+import com.minyushov.wheel.WheelPicker;
 
 import androidx.appcompat.app.AppCompatActivity;
 

@@ -1,23 +1,24 @@
 apply plugin: 'com.android.application'
 
 android {
-	compileSdkVersion 30
+	namespace = "com.minyushov.wheel.sample"
+	compileSdkVersion = 36
 	defaultConfig {
-		applicationId = "com.example.sample"
-		minSdkVersion 19
-		targetSdkVersion 30
-		versionCode 1
-		versionName "1.0"
+		applicationId = namespace
+		minSdkVersion(24)
+		targetSdkVersion(35)
+		versionCode = 1
+		versionName = "1.0"
 	}
 	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_8
-		targetCompatibility JavaVersion.VERSION_1_8
+		sourceCompatibility = JavaVersion.VERSION_21
+		targetCompatibility = JavaVersion.VERSION_21
 	}
 }
 
 dependencies {
-	implementation 'androidx.appcompat:appcompat:1.2.0'
-	implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+	implementation 'androidx.appcompat:appcompat:1.7.0'
+	implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
 	implementation project(":wheel-picker")
 }
