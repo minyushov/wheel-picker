@@ -23,7 +23,7 @@ dependencies {
 }
 
 mavenPublishing {
-  coordinates("io.github.minyushov", "wheel-picker", "2.0.0")
+  coordinates("io.github.minyushov", "wheel-picker", "2.0.1")
 
   publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
   signAllPublications()
